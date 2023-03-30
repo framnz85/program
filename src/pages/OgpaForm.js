@@ -16,13 +16,13 @@ import { isMobile } from 'react-device-detect';
 
 import TimerHeader from '../components/TimerHeader';
 
-import Sarisari from "../images/sarisari.jpg";
-import Paypal from "../images/paypal.png";
-import BDO from "../images/bdo.png";
-import BPI from "../images/bpi.png";
-import Unionbank from "../images/union.png";
-import Gcash from "../images/gcash.png";
-import Maya from "../images/maya.png";
+const Sarisari = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/sarisari.jpg";
+const Paypal = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/paypal.png";
+const BDO = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/bdo.png";
+const BPI = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/bpi.png";
+const Unionbank = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/union.png";
+const Gcash = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/gcash.png";
+const Maya = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/maya.png";
 
 const OgpaForm = () => {
     const navigate = useNavigate();
@@ -33,6 +33,8 @@ const OgpaForm = () => {
             cashAmount: 0,
             installAmount: 0,
             monthlyPay: 0,
+            startDate: "",
+            earlyDiscount: "",
         },
         name: "",
         email: "",
@@ -94,7 +96,9 @@ const OgpaForm = () => {
                 amount: {
                     cashAmount: ogpa.data.cashAmount,
                     installAmount: ogpa.data.installAmount,
-                    monthlyPay: ogpa.data.monthlyPay
+                    monthlyPay: ogpa.data.monthlyPay,
+                    startDate: ogpa.data.startDate,
+                    earlyDiscount: ogpa.data.earlyDiscount,
                 },
                 finalAmount: ogpa.data.cashAmount,
                 monthlyAmount: ogpa.data.cashAmount
@@ -146,7 +150,7 @@ const OgpaForm = () => {
             toast.error(newOgpa.data.err);
         } else {
             localStorage.setItem("ogpaUser", JSON.stringify(newOgpa.data));
-            navigate(`/ogpareg${mcid ? "?mcid=" + mcid : ""}`);
+            navigate(`/p/ogpareg${mcid ? "?mcid=" + mcid : ""}`);
         }
 
         if(mcid && values.email) {
@@ -170,6 +174,8 @@ const OgpaForm = () => {
                 extend={extend}
                 setSpotTaken={() => ""}
                 setSpotLeft={setSpotLeft}
+                startDate={values.amount.startDate}
+                earlyDiscount={values.amount.earlyDiscount}
             />}
             {extend === 0 && <TimerHeader
                 title="Register as We End in..."
@@ -178,6 +184,8 @@ const OgpaForm = () => {
                 extend={extend}
                 setSpotTaken={() => ""}
                 setSpotLeft={setSpotLeft}
+                startDate={values.amount.startDate}
+                earlyDiscount={values.amount.earlyDiscount}
             />}
             <div align="center" style={{padding: isMobile ? "10px" : "20px"}}>
                 <div align="center" style={{ backgroundColor: "#fff", width: isMobile ? "100%" : 1200, marginTop: 20, padding: 30, fontSize: 18, borderRadius: 8 }}>
@@ -230,7 +238,7 @@ const OgpaForm = () => {
                             <br/>
                         </Space>
                         <h5>Choose if Cash or Installment</h5>
-                        <b style={{color: "red"}}>NOTE: Less 4,000 pesos if you pay in Cash</b><br /><br />
+                        <b style={{color: "red"}}>NOTE: Less ₱{(values.amount.installAmount - values.amount.cashAmount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} if you pay in Cash</b><br /><br />
                         <Radio.Group
                             defaultValue="cash"
                             buttonStyle="solid"
@@ -242,8 +250,13 @@ const OgpaForm = () => {
                                 monthlyAmount: e.target.value === "cash" ? values.amount.cashAmount : values.amount.monthlyPay
                             })}
                         >
-                            <Radio.Button value="cash">Pay Cash @₱{values.amount && values.amount.cashAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Radio.Button>
-                            <Radio.Button value="install">Pay Installment @₱{values.amount && values.amount.monthlyPay.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/mo x 3 Months</Radio.Button>
+                            <Radio.Button value="cash">
+                                Pay Cash @₱{values.amount && values.amount.cashAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}{" "}
+                                <span style={{"text-decoration-line": "line-through"}}>(₱{values.amount && values.amount.installAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")})</span>
+                            </Radio.Button>
+                            <Radio.Button value="install">
+                                Installment @₱{values.amount && values.amount.monthlyPay.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/mo x 3 mo (₱{values.amount && values.amount.installAmount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")})
+                            </Radio.Button>
                         </Radio.Group>
                         <br /><br />
                         <h5>Choose a Payment Below</h5>

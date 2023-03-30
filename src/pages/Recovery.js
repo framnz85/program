@@ -1,42 +1,24 @@
 import React from 'react'
-import { Button, Checkbox, Form, Input } from 'antd';
+import { Button, Form, Input } from 'antd';
 import { toast } from 'react-toastify';
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { isMobile } from 'react-device-detect';
 
 const ClavstoreUniversity = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/clavstoreuniversity.png"
 
-const Login = () => {
+const Recovery = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    
+
     const onFinish = async (values) => {
-        const token = await axios.get(process.env.REACT_APP_API + "/university/generate-token/" + values.email.toLowerCase() + "/" + values.password)
-        if (token) {
-            const user = await axios.get(
-                process.env.REACT_APP_API + "/university/login-user", {
-                headers: {
-                    authToken: token.data,
-                },
-            });
-
-            if (user && user.data.err) {
-                toast.error(user.data.err);
-            } else {
-                const pathToRedirect = location && location.state && location.state.from;
-
-                sessionStorage.setItem("programUser", JSON.stringify(user.data));
-                sessionStorage.setItem("token", token.data);
-                if (values.remember) {
-                    localStorage.setItem("token", token.data);
-                }
-                if (pathToRedirect) {
-                    navigate(pathToRedirect, {replace: true});
-                } else {
-                    navigate("/home", {replace: true});
-                }
-            }
+        const updateUser = await axios.put(
+            process.env.REACT_APP_API + "/university/recover-password",
+                { email: values.email.toLowerCase() },
+        );
+        if (updateUser.data.err) {
+            toast.error(updateUser.data.err);
+        } else {
+            navigate(`/recoverform?name=${updateUser.data && updateUser.data.name}&email=${updateUser.data && updateUser.data.email}&rc=${updateUser.data && updateUser.data.recovery}`);
         }
     };
     
@@ -72,22 +54,23 @@ const Login = () => {
                 </div>
                 <h2 style={{fontSize: isMobile ? "24px" : "32px", paddingTop: isMobile ? 25 : 15}}>Clavstore University</h2>
             </div>
-            <div align="left"
+            <div align="center"
                 style={{
                     maxWidth: 450,
                     marginTop: 50
                 }}
             >
+                <p>Password Recovery (Enter Email)</p><br />
                 <Form
                     name="basic"
                     initialValues={{
                         remember: true,
                     }}
                     labelCol={{
-                        span: 6,
+                        span: 4,
                     }}
                     wrapperCol={{
-                        span: 16,
+                        span: 20,
                     }}
                     onFinish={onFinish}
                     onFinishFailed={onFinishFailed}
@@ -112,45 +95,9 @@ const Login = () => {
                     </Form.Item>
 
                     <Form.Item
-                        label="Password"
-                        name="password"
-                        rules={[
-                            {
-                            required: true,
-                            message: 'Please input your password!',
-                            },
-                            () => ({
-                                validator(_, value) {
-                                    if (value.length > 7) {
-                                        return Promise.resolve();
-                                    }
-                                    return Promise.reject(new Error('Password must be at least 8 characters'));
-                                },
-                            }),
-                        ]}
-                    >
-                        <Input.Password style={{padding: isMobile ? 10 : 6}} />
-                    </Form.Item>
-
-                    <div style={{
-                        display: "grid",
-                        gridTemplateColumns: isMobile ? "80% 20%" : "70% 30%",
-                        paddingLeft: isMobile ? 0 : 115
-                    }}>
-                        <Form.Item
-                            name="remember"
-                            valuePropName="checked"
-                        >
-                            <Checkbox>Remember me</Checkbox>
-                        </Form.Item>
-
-                        <Link to="/register" style={{paddingTop: 5}}>Register</Link>
-                    </div>
-
-                    <Form.Item
                         wrapperCol={{
-                            offset: isMobile ? 0 : 6,
-                            span: 16,
+                            offset: isMobile ? 0 : 4,
+                            span: 20,
                         }}
                     >
                         <Button
@@ -161,10 +108,13 @@ const Login = () => {
                             }}
                             htmlType="submit"
                         >
-                            Login
+                            Recovery Submit
                         </Button>
                         <div align="center" style={{marginTop: 20}}>
-                            <Link to="/recovery">Forgot Password?</Link>
+                            <Link to="/recovercode">I have a Recovery Code</Link>
+                        </div>
+                        <div align="center" style={{marginTop: 20}}>
+                            <Link to="/login">Back To Login</Link>
                         </div>
                     </Form.Item>
                 </Form>
@@ -173,4 +123,4 @@ const Login = () => {
      );
 }
  
-export default Login;
+export default Recovery;

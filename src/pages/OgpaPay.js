@@ -8,13 +8,13 @@ import { useNavigate  } from "react-router-dom";
 
 import TimerHeader from '../components/TimerHeader';
 
-import Sarisari from "../images/sarisari.jpg";
-import Paypal from "../images/paypal.png";
-import BDO from "../images/bdo.png";
-import BPI from "../images/bpi.png";
-import Unionbank from "../images/union.png";
-import Gcash from "../images/gcash.png";
-import Maya from "../images/maya.png";
+const Sarisari = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/sarisari.jpg";
+const Paypal = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/paypal.png";
+const BDO = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/bdo.png";
+const BPI = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/bpi.png";
+const Unionbank = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/union.png";
+const Gcash = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/gcash.png";
+const Maya = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/maya.png";
 
 const OgpaPay = () => {
     const navigate = useNavigate();
@@ -30,6 +30,13 @@ const OgpaPay = () => {
     });
     const [extend, setExtend] = useState(0);
     const [spotLeft, setSpotLeft] = useState(0);
+    const [amount, setAmount] = useState({
+        cashAmount: 0,
+        installAmount: 0,
+        monthlyPay: 0,
+        startDate: "",
+        earlyDiscount: "",
+    });
 
     const paypalClientId = "ATy4_rfmeiT3mEPwjPOHoUFbNA_ZSsqGT9BvtkFkMW4io40J4kdX0NQpYM9YdSWXmawnKufvTNaEuuOg"
 
@@ -62,11 +69,13 @@ const OgpaPay = () => {
         if (ogpa.data.err) {
             toast.error(ogpa.data.err);
         } else {
-            setOgpaUser({
-                ...ogpaUser,
+            setAmount({
+                ...amount,
                 cashAmount: ogpa.data.cashAmount,
                 installAmount: ogpa.data.installAmount,
                 monthlyPay: ogpa.data.monthlyPay,
+                startDate: ogpa.data.startDate,
+                earlyDiscount: ogpa.data.earlyDiscount,
             });
             setExtend(ogpa.data.extend);
         }
@@ -76,7 +85,7 @@ const OgpaPay = () => {
         const ogpaExist = await axios.get(process.env.REACT_APP_API + "/ogpa-email/" + queryParams.get("ogpaem"));
 
         if (!ogpaExist.data._id || ogpaExist.data.err) {
-            navigate(`/ogpaform${mcid ? "?mcid=" + mcid : ""}`);
+            navigate(`/p/ogpaform${mcid ? "?mcid=" + mcid : ""}`);
         } else {
             setOgpaUser(ogpaExist.data);
             localStorage.setItem("ogpaUser", JSON.stringify(ogpaExist.data));
@@ -107,6 +116,8 @@ const OgpaPay = () => {
                 extend={extend}
                 setSpotTaken={() => ""}
                 setSpotLeft={setSpotLeft}
+                startDate={amount.startDate}
+                earlyDiscount={amount.earlyDiscount}
             />}
             {extend === 0 && <TimerHeader
                 title="You only have this time left to pay OGPA..."
@@ -115,11 +126,18 @@ const OgpaPay = () => {
                 extend={extend}
                 setSpotTaken={() => ""}
                 setSpotLeft={setSpotLeft}
+                startDate={amount.startDate}
+                earlyDiscount={amount.earlyDiscount}
             />}
             <div align="center">
                 <div align="center" style={{ backgroundColor: "#fff", width: isMobile ? "100%" : 1200, marginTop: 20, padding: 30, fontSize: 18, borderRadius: 8 }}>
                     <h3>Choose if Cash or Installment</h3>
-                    <b style={{color: "red"}}>NOTE: Less 4,000 pesos if you pay in Cash</b><br /><br />
+                    <b style={{color: "red"}}>NOTE: Less ₱{(amount.installAmount - amount.cashAmount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} if you pay in Cash</b><br />
+                    {ogpaUser.payment !== "pal" && <h6 style={{color: "red"}}>
+                        WARNING: Send your payments only to the Account Number and Account Name shown below.
+                        We are not liable if payment are not sent directly to our accounts.
+                    </h6>}
+                    <br />
                     <Radio.Group
                         defaultValue={ogpaUser.paymentType && ogpaUser.paymentType.toString()}
                         buttonStyle="solid"

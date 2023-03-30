@@ -8,8 +8,8 @@ import TimerHeader from '../components/TimerHeader';
 import TimerContent from '../components/TimerContent';
 import OgpaContent from '../components/OgpaContent';
 
-import Sarisari from "../images/sarisari.jpg";
-import PaymentOpt from "../images/paymentopt.png";
+const Sarisari = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/sarisari.jpg";
+const PaymentOpt = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/paymentopt.png";
 
 const Ogpa = () => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -28,6 +28,8 @@ const Ogpa = () => {
         cashAmount: 0,
         installAmount: 0,
         monthlyPay: 0,
+        startDate: "",
+        earlyDiscount: "",
     });
     const [schedules, setSchedules] = useState({
         registerEnd: "",
@@ -109,6 +111,8 @@ const Ogpa = () => {
                 cashAmount: ogpa.data.cashAmount,
                 installAmount: ogpa.data.installAmount,
                 monthlyPay: ogpa.data.monthlyPay,
+                startDate: ogpa.data.startDate,
+                earlyDiscount: ogpa.data.earlyDiscount,
             });
             setExtend(ogpa.data.extend);
             setSchedules({
@@ -140,9 +144,9 @@ const Ogpa = () => {
             if(mcid) {
                 await axios.get(process.env.REACT_APP_API + "/manychat/" + mcid + "/content20221004105543_802719");
             }
-            window.location.href = `/ogpaform${mcid ? "?mcid=" + mcid : ""}`;
+            window.location.href = `/p/ogpaform${mcid ? "?mcid=" + mcid : ""}`;
         } catch (error) {
-            window.location.href = `/ogpaform${mcid ? "?mcid=" + mcid : ""}`;
+            window.location.href = `/p/ogpaform${mcid ? "?mcid=" + mcid : ""}`;
         }
     }
 
@@ -160,6 +164,8 @@ const Ogpa = () => {
                 extend={extend}
                 setSpotTaken={setSpotTaken}
                 setSpotLeft={setSpotLeft}
+                startDate={amount.startDate}
+                earlyDiscount={amount.earlyDiscount}
             />}
             {extend === 0 && active && <TimerHeader
                 title="Watch the video below before this time ends..."
@@ -168,6 +174,8 @@ const Ogpa = () => {
                 extend={extend}
                 setSpotTaken={setSpotTaken}
                 setSpotLeft={setSpotLeft}
+                startDate={amount.startDate}
+                earlyDiscount={amount.earlyDiscount}
             />}
             <div align="center" style={{padding: isMobile ? "10px" : "20px"}}>
                 {active && <div style={{ backgroundColor: "#fff", width: isMobile ? "100%" : 1200, padding: isMobile ? "20px" : "40px", borderRadius: 8 }}>     

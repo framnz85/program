@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react'
+import React from 'react'
 import { Button, Form, Input } from 'antd';
 import { toast } from 'react-toastify';
 import { Link, useNavigate } from "react-router-dom";
@@ -7,80 +7,28 @@ import { isMobile } from 'react-device-detect';
 
 const ClavstoreUniversity = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/clavstoreuniversity.png"
 
-const Register = () => {
+const RecoverCode = () => {
     const navigate = useNavigate();
     const queryParams = new URLSearchParams(window.location.search);
-    const initRefid = "63fa250056d101375f142fe3";
-    
-    const [refid, setRefid] = useState(initRefid);
 
     const onFinish = async (values) => {
-        delete values.remember;
-        delete values.repassword;
-
-        if (refid !== "null") {
-            values={...values, refid}
-        }
-
-        const token = await axios.get(process.env.REACT_APP_API + "/university/generate-token/" + values.email.toLowerCase() + "/" + values.password)
-
-        if (token) {
-            const recovery = generateCode(8);
-    
-            const user = await axios.post(process.env.REACT_APP_API + "/university/add-user", {
-                name: values.name,
-                recovery,
-                confirmed: false,
-                refid: refid !== "null" ? refid : initRefid
-            }, {
-                headers: {
-                    authToken: token.data,
-                },
-            });
-    
-            if (user && user.data.err) {
-                toast.error(user.data.err);
-            } else {
-                sessionStorage.setItem("programUser", JSON.stringify(user.data));
-                localStorage.setItem("token", token.data);
-                sessionStorage.setItem("token", token.data);
-                navigate("/infocheck");
-            }
+        const updateUser = await axios.put(
+            process.env.REACT_APP_API + "/university/recover-password",
+                { email: values.email.toLowerCase(), recovery: values.recovery.trim(), password: values.password },
+        );
+        if (updateUser.data.err) {
+            toast.error(updateUser.data.err);
         } else {
-            toast.error("No token has produced.");
+            sessionStorage.setItem("programUser", JSON.stringify(updateUser.data));
+            navigate("/home");
         }
     };
-
-    const generateCode = (length) => {
-        let result = '';
-        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        const charactersLength = characters.length;
-        let counter = 0;
-        while (counter < length) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-            counter += 1;
-        }
-        return result;
-    }
     
     const onFinishFailed = (errorInfo) => {
         errorInfo.errorFields.map(field => {
             return toast.error(field.errors[0])
         })
     };
-
-    useEffect(() => {
-        if (!localStorage.getItem("refid")) {
-            const isRefid = queryParams.get("refid");
-            if (isRefid) {
-                localStorage.setItem("refid", isRefid);
-            }
-        } else {
-            if (localStorage.getItem("refid") !== "null") {
-                setRefid(localStorage.getItem("refid"));
-            }
-        }
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
     
     return ( 
         <div align="center" style={{padding: 20}}>
@@ -108,12 +56,17 @@ const Register = () => {
                 </div>
                 <h2 style={{fontSize: isMobile ? "24px" : "32px", paddingTop: isMobile ? 25 : 15}}>Clavstore University</h2>
             </div>
-            <div align="left"
+            <div align="center"
                 style={{
                     maxWidth: 450,
                     marginTop: 50
                 }}
             >
+                <p>Password Recovery</p>
+                {queryParams.get("success")
+                    ? <p style={{color: "red"}}>Get the Recovery Code we sent you on your email address. Place it below and create your new password.</p>
+                    : <p style={{color: "red"}}>Place your Recovery Code below to create new password</p>
+                }<br />
                 <Form
                     name="basic"
                     initialValues={{
@@ -129,18 +82,6 @@ const Register = () => {
                     onFinishFailed={onFinishFailed}
                     autoComplete="off"
                 >
-                    <Form.Item
-                        label="Full Name"
-                        name="name"
-                        rules={[
-                            {
-                            required: true,
-                            message: 'Please input your name!',
-                            },
-                        ]}
-                    >
-                        <Input style={{padding: isMobile ? 10 : 6}} />
-                    </Form.Item>
 
                     <Form.Item
                         label="Email"
@@ -160,12 +101,25 @@ const Register = () => {
                     </Form.Item>
 
                     <Form.Item
-                        label="Password"
+                        label="Recovery Code"
+                        name="recovery"
+                        rules={[
+                            {
+                            required: true,
+                            message: 'Please input your recovery code!',
+                            },
+                        ]}
+                    >
+                        <Input style={{padding: isMobile ? 10 : 6}} />
+                    </Form.Item>
+
+                    <Form.Item
+                        label="New Password"
                         name="password"
                         rules={[
                             {
-                                required: true,
-                                message: 'Please input your password!',
+                            required: true,
+                            message: 'Please input your password!',
                             },
                             () => ({
                                 validator(_, value) {
@@ -202,16 +156,6 @@ const Register = () => {
                         <Input.Password style={{padding: isMobile ? 10 : 6}} />
                     </Form.Item>
 
-                    {refid && refid !== "null" && <Form.Item
-                        label="Referred By"
-                    >
-                        {refid}
-                    </Form.Item>}
-
-                    <div align="right">
-                        <Link to="/login" style={{paddingTop: 5}}>Login Now</Link><br /><br />
-                    </div>
-
                     <Form.Item
                         wrapperCol={{
                             offset: isMobile ? 0 : 8,
@@ -226,8 +170,14 @@ const Register = () => {
                             }}
                             htmlType="submit"
                         >
-                            Register
+                            Recovery Submit
                         </Button>
+                        <div align="center" style={{marginTop: 20}}>
+                            <Link to="/recovery">I don't have Recovery Code</Link>
+                        </div>
+                        <div align="center" style={{marginTop: 20}}>
+                            <Link to="/login">Back To Login</Link>
+                        </div>
                     </Form.Item>
                 </Form>
             </div>
@@ -235,4 +185,4 @@ const Register = () => {
      );
 }
  
-export default Register;
+export default RecoverCode;

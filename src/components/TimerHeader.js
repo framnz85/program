@@ -1,8 +1,19 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
-const TimerHeader = ({ title, timer, setTimer, extend, setSpotTaken, setSpotLeft }) => {
+const TimerHeader = ({
+    title,
+    timer,
+    setTimer,
+    extend,
+    setSpotTaken,
+    setSpotLeft,
+    startDate = "",
+    earlyDiscount="",
+}) => {
     const Ref = useRef(null);
+
+    const [earlyBird, setEarlyBird] = useState("");
 
     const getTimeRemaining = (e) => {
         const total = Date.parse(e) - Date.parse(new Date());
@@ -91,7 +102,8 @@ const TimerHeader = ({ title, timer, setTimer, extend, setSpotTaken, setSpotLeft
         const endDay = getEndDay();
         clearTimer(getDeadTime(endDay));
         getWeekNumber(endDay);
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+        if ((endDay === 14 || endDay === 8) && earlyDiscount) setEarlyBird(`Early Bird Discount Until ${earlyDiscount}!!!`);
+    }, [startDate, earlyDiscount]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const timerBody = {
         width: 80,
@@ -134,6 +146,7 @@ const TimerHeader = ({ title, timer, setTimer, extend, setSpotTaken, setSpotLeft
                         <div>{timer.seconds > 1 ? "Seconds" : "Second"}</div>
                     </div>
                 </div>
+                <span style={{ color: "yellow" }}>{earlyBird}</span>
             </center>
         </div>
      );

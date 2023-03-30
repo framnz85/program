@@ -2,28 +2,28 @@ import React from 'react';
 import { RightCircleOutlined } from '@ant-design/icons';
 import { isMobile } from 'react-device-detect';
 
-import MentoringGroup from "../images/mentoringgroup.png";
-import SampleDelivery from "../images/sampledelivery.png";
-import NimfaManiscan from "../images/nimfamaniscan.png";
-import McjhimBumacod from "../images/mcjhimbumacod.png";
-import GregSinugbojan from "../images/gregsinugbojan.png";
-import KleinDelosSantos from "../images/kleindelossantos.png";
-import BuyingCustomer from "../images/buyingcustomer.png";
-import Order18000 from "../images/order18000.png";
-import Order28000 from "../images/order28000.png";
-import OgpaWorkshop from "../images/ogpaworkshop.png";
-import MoneyBackGuarantee from "../images/moneybackguarantee.png";
-import ActoionTakerGuarantee from "../images/actoiontakerguarantee.png";
+const MentoringGroup = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/mentoringgroup.png";
+const SampleDelivery = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/sampledelivery.png";
+const NimfaManiscan = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/nimfamaniscan.png";
+const McjhimBumacod = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/mcjhimbumacod.png";
+const GregSinugbojan = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/gregsinugbojan.png";
+const KleinDelosSantos = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/kleindelossantos.png";
+const BuyingCustomer = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/buyingcustomer.png";
+const Order18000 = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/order18000.png";
+const Order28000 = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/order28000.png";
+const OgpaWorkshop = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/ogpaworkshop.png";
+const MoneyBackGuarantee = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/moneybackguarantee.png";
+const ActoionTakerGuarantee = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/actoiontakerguarantee.png";
 
-import NickTrinidad from "../images/nicktrinidad.png";
-import ArmanViacrucis from "../images/armanviacrucis.png";
-import RosalindaRayo from "../images/rosalindarayo.png";
-import JunneferGabinete from "../images/junnefergabinete.png";
-import SalvacionCaranay from "../images/salvacioncaranay.png";
-import ValiantDominic  from "../images/valiantdominic.png";
-import BernaCordero from "../images/bernacordero.png";
-import MaryGracePasco from "../images/marygracepasco.png";
-import MaritesGuzman from "../images/maritesguzman.png";
+const NickTrinidad = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/nicktrinidad.png";
+const ArmanViacrucis = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/armanviacrucis.png";
+const RosalindaRayo = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/rosalindarayo.png";
+const JunneferGabinete = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/junnefergabinete.png";
+const SalvacionCaranay = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/salvacioncaranay.png";
+const ValiantDominic  = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/valiantdominic.png";
+const BernaCordero = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/bernacordero.png";
+const MaryGracePasco = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/marygracepasco.png";
+const MaritesGuzman = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/maritesguzman.png";
 
 const OgpaContent = ({
     handleButtonClick,

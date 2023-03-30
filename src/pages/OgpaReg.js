@@ -6,7 +6,7 @@ import axios from 'axios';
 
 import TimerHeader from '../components/TimerHeader';
 
-import Sarisari from "../images/sarisari.jpg";
+const Sarisari = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/sarisari.jpg";
 
 const initialState = {
     name: "",
@@ -32,6 +32,8 @@ const OgpaReg = () => {
         days: 0, hours: 0, minutes: 0, seconds:0
     });
     const [extend, setExtend] = useState(0);
+    const [startDate, setStartDate] = useState("");
+    const [earlyDiscount, setEarlyDiscount] = useState("");
 
     useEffect(() => {
         const d = new Date();
@@ -66,6 +68,8 @@ const OgpaReg = () => {
             toast.error(ogpa.data.err);
         } else {
             setExtend(ogpa.data.extend)
+            setStartDate(ogpa.data.startDate);
+            setEarlyDiscount(ogpa.data.earlyDiscount);
         }
     }
 
@@ -78,6 +82,8 @@ const OgpaReg = () => {
                 extend={extend}
                 setSpotTaken={() => ""}
                 setSpotLeft={() => ""}
+                startDate={startDate}
+                earlyDiscount={earlyDiscount}
             />}
             {extend === 0 && <TimerHeader
                 title="Time left to finish registration..."
@@ -86,6 +92,8 @@ const OgpaReg = () => {
                 extend={extend}
                 setSpotTaken={() => ""}
                 setSpotLeft={() => ""}
+                startDate={startDate}
+                earlyDiscount={earlyDiscount}
             />}
             <div align="center" style={{padding: isMobile ? "10px" : "20px"}}>
                 <div align="center" style={{ backgroundColor: "#fff", width: isMobile ? "100%" : 1200, marginTop: 20, padding: 30, fontSize: 18, borderRadius: 8 }}>
@@ -167,7 +175,7 @@ const OgpaReg = () => {
                                 </div>
                                 <div className="af-element buttonContainer">
                                     <input name="submit" className="submit" type="submit" value="Continue" tabIndex="505" /><br /><br />
-                                    <input name="submit" type="submit" value="Go Back" tabIndex="505" onClick={() => navigate("/ogpaform")} />
+                                    <input name="submit" type="submit" value="Go Back" tabIndex="505" onClick={() => navigate("/p/ogpaform")} />
                                     <div className="af-clear"></div>
                                 </div>
                             </div>
