@@ -4,7 +4,7 @@ import Joi from "joi-browser";
 import { isMobile } from 'react-device-detect';
 import { toast } from 'react-toastify';
 
-const Withdraw = ({dashboard}) => {
+const Withdraw = ({dashboard, popup = false}) => {
     const [loading, setLoading] = useState(false);
 
     const schema = {
@@ -43,7 +43,9 @@ const Withdraw = ({dashboard}) => {
     };
 
     return ( 
-        <div align="center" style={{ padding: isMobile ? 10 : 40 }}>
+        <div align="center" style={{ padding: isMobile ? 10 : 20 }}>
+            <p style={{color: "red"}}>Make your earnings to 30,000 pesos and then withdraw!</p>
+            <br />
             <Form
                 name="basic"
                 labelCol={{
@@ -117,13 +119,13 @@ const Withdraw = ({dashboard}) => {
                     <Input />
                 </Form.Item>
 
-                <div align="center" style={{marginLeft: isMobile ? 0 : 190}}>
+                <div align="center" style={{marginLeft: (isMobile || popup) ? 0 : 190}}>
                     <p><b>Balance:</b> {dashboard.totalRemaining.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} <b>Min. Amount:</b> 30,000.00</p>
                 </div>
 
                 <Form.Item
                     wrapperCol={{
-                        offset: isMobile ? 0 : 8,
+                        offset: isMobile ? 0 : popup ? 4 : 8,
                         span: 16,
                     }}
                 >

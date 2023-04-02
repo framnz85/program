@@ -50,6 +50,7 @@ const PromoteCard = ({prom, type, program}) => {
                         style={{width: "80%", height: "80%", paddingTop: 20}}
                     /> : 
                     <iframe src={`https://drive.google.com/file/d/${prom.driveID}/preview`} title={prom.title} width="80%" height="80%" allow="autoplay" />}
+                    <br /><strong>Type: {prom.type}</strong>
                 </div>
             }
             actions={[
@@ -76,11 +77,13 @@ const PromoteCard = ({prom, type, program}) => {
             <Meta
                 title={prom.title}
                 description={
-                    <TextArea
-                        rows={4}
-                        value={`${prom.script} \n\n${program && program.saleSlug ? "See the details" : "Register"} on this link ${listUrl[registerUrl]}/${program && program.saleSlug ? "p/" + program.saleSlug : ""}?refid=${sessionUser && sessionUser._id}`}
-                        id={`myInput${prom._id}`}
-                    />
+                    <>
+                        <TextArea
+                            rows={4}
+                            value={`${prom.script} \n\n${program && program.saleSlug ? "See the details" : "Register"} on this link ${listUrl[registerUrl]}/${program && program.saleSlug ? "p/" + program.saleSlug : ""}?refid=${sessionUser && sessionUser._id}`}
+                            id={`myInput${prom._id}`}
+                        />
+                    </>
                 }
             />
         </Card>

@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import { Layout, Button } from 'antd';
 import { isMobile } from 'react-device-detect';
+import { useNavigate } from "react-router-dom";
 
 import MainHeader from '../components/common/MainHeader';
 import MainFooter from '../components/common/MainFooter';
@@ -17,11 +18,18 @@ const initialState = {
 }
 
 const Home = () => {
+    const navigate = useNavigate();
+    const pathToRedirect = sessionStorage.getItem("pathToRedirect");
+
+    if (pathToRedirect) {
+        navigate(pathToRedirect, { replace: true });
+    }
+
     const [dashboard, setDashboard] = useState(initialState);
     const [tabMenu, setTabMenu] = useState(1);
     const [noRegBonus, setnoRegBonus] = useState(false);
     const [noMessenger, setNoMessenger] = useState(false);
-
+    
     const tabs = {
         float: "left",
         padding: "5px 10px",

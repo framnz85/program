@@ -9,8 +9,12 @@ const InfoCheck = () => {
     const pathToRedirect = location && location.state && location.state.from;
     const sessionUser = JSON.parse(sessionStorage.getItem("programUser"));
 
-    const [name, setName] = useState(sessionUser.name);
-    const [email, setEmail] = useState(sessionUser.email);
+    const [name, setName] = useState(sessionUser ? sessionUser.name : "");
+    const [email, setEmail] = useState(sessionUser ? sessionUser.email : "");
+    
+    if (pathToRedirect) {
+        sessionStorage.setItem("pathToRedirect", pathToRedirect);
+    }
 
     return ( 
         <div align="center" style={{padding: 20}}>
@@ -48,8 +52,8 @@ const InfoCheck = () => {
                         <input type="hidden" name="meta_web_form_id" value="352608519" />
                         <input type="hidden" name="meta_split_id" value="" />
                         <input type="hidden" name="listname" value="awlist6327146" />
-                        <input type="hidden" name="redirect" value={pathToRedirect ? `https://${window.location.hostname}${pathToRedirect}` : `https://${window.location.hostname}/home`} id="redirect_a8d4c8b3e93780ea1fa1ddb20d386b2d" />
-                        <input type="hidden" name="meta_redirect_onlist" value={pathToRedirect ? `https://${window.location.hostname}${pathToRedirect}` : `https://${window.location.hostname}/home`} />
+                        <input type="hidden" name="redirect" value={`https://${window.location.hostname}/home`} id="redirect_a8d4c8b3e93780ea1fa1ddb20d386b2d" />
+                        <input type="hidden" name="meta_redirect_onlist" value={`https://${window.location.hostname}/home`} />
                         <input type="hidden" name="meta_adtracking" value="Clavstore_University" />
                         <input type="hidden" name="meta_message" value="1" />
                         <input type="hidden" name="meta_required" value="name,email" />
@@ -76,7 +80,7 @@ const InfoCheck = () => {
                                 <label className="previewLabel" htmlFor="awf_field-115504348">Recovery: </label><br/><br/>
                                 <div align="left">Save your recovery code below somewhere else for future account recovery needs.</div>
                                 <div className="af-textWrap">
-                                    <input type="text" id="awf_field-115504348" className="text" name="custom defaultPassword" value={sessionUser.recovery} onChange={() => ""} /></div>
+                                    <input type="text" id="awf_field-115504348" className="text" name="custom defaultPassword" value={sessionUser ? sessionUser.recovery : ""} onChange={() => ""} /></div>
                                 <div className="af-clear"></div>
                             </div>
                             <div className="af-element buttonContainer">

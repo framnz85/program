@@ -10,6 +10,7 @@ const ClavstoreUniversity = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images
 const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const pathToRedirect = location && location.state && location.state.from;
     
     const onFinish = async (values) => {
         const token = await axios.get(process.env.REACT_APP_API + "/university/generate-token/" + values.email.toLowerCase() + "/" + values.password)
@@ -24,8 +25,6 @@ const Login = () => {
             if (user && user.data.err) {
                 toast.error(user.data.err);
             } else {
-                const pathToRedirect = location && location.state && location.state.from;
-
                 sessionStorage.setItem("programUser", JSON.stringify(user.data));
                 sessionStorage.setItem("token", token.data);
                 if (values.remember) {
@@ -144,7 +143,7 @@ const Login = () => {
                             <Checkbox>Remember me</Checkbox>
                         </Form.Item>
 
-                        <Link to="/register" style={{paddingTop: 5}}>Register</Link>
+                        <Link to="/register" state={{ from: pathToRedirect ? pathToRedirect : "/home" }} style={{paddingTop: 5}}>Register</Link>
                     </div>
 
                     <Form.Item

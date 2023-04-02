@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react'
-import { Layout, Menu } from 'antd';
+import { Layout, Menu, Modal } from 'antd';
 import { useNavigate } from "react-router-dom";
 import { isMobile } from 'react-device-detect';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
 import NextSteps from './NextSteps';
+import Withdraw from '../account/Withdraw';
 
 const { Header } = Layout;
 
@@ -19,6 +20,7 @@ const MainHeader = ({defaultKey, dashboard, setDashboard, noRegBonus = false}) =
     
     const [stepModal, showStepModal] = useState(false);
     const [sessionUser, setSessionUser] = useState({});
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         getUserDetails();
@@ -97,13 +99,22 @@ const MainHeader = ({defaultKey, dashboard, setDashboard, noRegBonus = false}) =
         { key: 4, label: "My Programs", destination: "/myprograms" },
         { key: 6, label: "Promote", destination: "/promote" },
         { key: 5, label: "Premium", destination: "/premium" },
+        { key: 7, label: "Withdraw" },
         { key: 1, label: "Account", destination: "/account" },
     ];
 
     const onNavChange = (value) => {
-        const result = headerNav.filter(head => head.key === parseInt(value.key));
-        navigate(result[0].destination);
+        if (value.key === "7") {
+            setIsModalOpen(true);
+        } else {
+            const result = headerNav.filter(head => head.key === parseInt(value.key));
+            navigate(result[0].destination);
+        }
     }
+
+    const handleCancel = () => {
+        setIsModalOpen(false);
+    };
 
     return ( 
         <Layout>
@@ -140,6 +151,9 @@ const MainHeader = ({defaultKey, dashboard, setDashboard, noRegBonus = false}) =
                 showStepModal={showStepModal}
                 noRegBonus={noRegBonus}
             />}
+            <Modal title="Withdraw Earnings" open={isModalOpen} onCancel={handleCancel} footer={null} >
+                <Withdraw dashboard={dashboard} popup={true} />
+            </Modal>
         </Layout>
      );
 }

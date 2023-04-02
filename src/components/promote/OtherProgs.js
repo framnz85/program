@@ -13,7 +13,7 @@ const initialState = {
     sortkey: "item",
     sort: 1,
     total: 0,
-    type: "image"
+    type: "all"
 }
 
 const OtherProgs = ({program}) => {
@@ -51,8 +51,10 @@ const OtherProgs = ({program}) => {
                     }
                     value={showPage.type}
                 >
+                    <Radio value={"all"}>All</Radio>
                     <Radio value={"image"}>Images</Radio>
                     <Radio value={"video"}>Videos</Radio>
+                    <Radio value={"training"}>Trainings</Radio>
                 </Radio.Group><br /><br />
                 
                 <Pagination

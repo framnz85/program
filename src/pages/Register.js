@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import { Button, Form, Input } from 'antd';
 import { toast } from 'react-toastify';
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from 'axios';
 import { isMobile } from 'react-device-detect';
 
@@ -9,6 +9,8 @@ const ClavstoreUniversity = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images
 
 const Register = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const pathToRedirect = location && location.state && location.state.from;
     const queryParams = new URLSearchParams(window.location.search);
     const initRefid = "63fa250056d101375f142fe3";
     
@@ -209,7 +211,7 @@ const Register = () => {
                     </Form.Item>}
 
                     <div align="right">
-                        <Link to="/login" style={{paddingTop: 5}}>Login Now</Link><br /><br />
+                        <Link to="/login" state={{ from: pathToRedirect ? pathToRedirect : "/home" }} style={{paddingTop: 5}}>Login Now</Link><br /><br />
                     </div>
 
                     <Form.Item

@@ -9,10 +9,18 @@ import { isMobile } from 'react-device-detect';
 const SalesProgram = () => {
     const navigate = useNavigate();
     const { slug } = useParams();
+    const queryParams = new URLSearchParams(window.location.search);
     let token = localStorage.getItem("token");
     if (!token) {
         token = sessionStorage.getItem("token");
     }
+    
+    const refid = queryParams.get("refid");
+
+    if (!localStorage.getItem("refid") || localStorage.getItem("refid") === "null") {
+        localStorage.setItem("refid", refid);
+    }
+    
     const [program, setProgram] = useState({});
     
     useEffect(() => {
