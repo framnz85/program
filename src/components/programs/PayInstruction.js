@@ -93,7 +93,7 @@ const PayInstruction = ({program, user, setUser}) => {
                     Total Amount to Pay Now: <b>{payment === "pal" ? "$" : "₱"}{(payment === "pal" ? amount/50 : amount).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b>
                     {payment !== "pal" && <h6>
                         WARNING: Send your payments only to the Account Number and Account Name shown below.
-                        We are not liable if payment are not sent directly to our accounts.
+                        We are not liable for lost payment that are not sent directly to our accounts.
                     </h6>}
                 </span><br /><br />
                 <Radio.Group onChange={onChange} value={payment && payment.toString()}>

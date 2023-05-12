@@ -49,7 +49,7 @@ const Withdraw = ({dashboard, popup = false}) => {
             <Form
                 name="basic"
                 labelCol={{
-                    span: 8,
+                    span: 6,
                 }}
                 wrapperCol={{
                     span: 16,
@@ -119,13 +119,13 @@ const Withdraw = ({dashboard, popup = false}) => {
                     <Input />
                 </Form.Item>
 
-                <div align="center" style={{marginLeft: (isMobile || popup) ? 0 : 190}}>
+                <div align="center" style={{marginLeft: (isMobile || popup) ? 0 : 100}}>
                     <p><b>Balance:</b> {dashboard.totalRemaining.toFixed(2).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} <b>Min. Amount:</b> 30,000.00</p>
                 </div>
 
                 <Form.Item
                     wrapperCol={{
-                        offset: isMobile ? 0 : popup ? 4 : 8,
+                        offset: isMobile ? 0 : popup ? 4 : 6,
                         span: 16,
                     }}
                 >

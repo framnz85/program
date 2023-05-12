@@ -3,6 +3,8 @@ import { Button, Modal, Radio, Input } from 'antd';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+import { premium } from '../common/currency';
+
 const Paypal = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/paypal.png";
 const BDO = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/bdo.png";
 const BPI = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/bpi.png";
@@ -11,12 +13,12 @@ const Gcash = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/gcash.png";
 const Maya = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/maya.png";
 
 const paymentAmount = [
-    {desc: "pal", amount: "$120"},
-    {desc: "bdo", amount: "P5990"},
-    {desc: "bpi", amount: "P5990"},
-    {desc: "uni", amount: "P5990"},
-    {desc: "gca", amount: "P5990"},
-    {desc: "may", amount: "P5990"},
+    {desc: "pal", amount: "$" + premium.dollar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")},
+    {desc: "bdo", amount: "₱" + premium.peso.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")},
+    {desc: "bpi", amount: "₱" + premium.peso.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")},
+    {desc: "uni", amount: "₱" + premium.peso.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")},
+    {desc: "gca", amount: "₱" + premium.peso.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")},
+    {desc: "may", amount: "₱" + premium.peso.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")},
 ]
 
 const PremiumUp = ({setPremium, payment, setPayment}) => {
@@ -26,14 +28,32 @@ const PremiumUp = ({setPremium, payment, setPayment}) => {
         token = sessionStorage.getItem("token");
     }
 
-    const [amountTxt, setAmountTxt] = useState("$120");
+    const [amountTxt, setAmountTxt] = useState("$" + premium.dollar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [domainName, setDomainName] = useState("");
     const [domainAvail, setDomainAvail] = useState(false);
 
     useEffect(() => {
-        setPremium(sessionUser.premium ? sessionUser.premium : 0);
+        if (sessionUser) {
+            setPremium(sessionUser ? sessionUser.premium : 0);
+        } else {
+            fetchUser();
+        }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const fetchUser = async() => {
+        const user = await axios.get(
+            process.env.REACT_APP_API + "/university/get-user", {
+            headers: {
+                authToken: token,
+            },
+        });
+        if (user.data.err) {
+            toast.error(user.data.err);
+        } else {
+            setPremium(user.data ? user.data.premium : 0);
+        }
+    }
 
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -119,7 +139,7 @@ const PremiumUp = ({setPremium, payment, setPayment}) => {
             >
                 Upgrade To Premium
             </Button><br /><br />
-            <h5>Only $120/yr or Php 5,990/yr</h5>
+            <h5>Only ${premium.dollar.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/yr or ₱{premium.peso.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}/yr</h5>
 
             <Modal
                 title="Upgrade To Premium?"

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { isMobile } from 'react-device-detect';
 
 import { currency } from '../common/currency';
+import { noImage } from '../common/uriImages';
 
 const { Meta } = Card;
 
@@ -23,7 +24,7 @@ const ProgramCard = ({prog}) => {
             cover={
                 <img
                     alt={prog.title ? prog.title : ""}
-                    src={prog.image1 ? process.env.REACT_APP_CLAVMALL_IMG + "/program_images/" + prog.image1 : ""}
+                    src={prog.image1 ? prog.image1 : noImage}
                 />
             }
             onClick={() => prog.slug ? navigate("/program/" + prog.slug) : ""}

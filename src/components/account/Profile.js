@@ -47,7 +47,7 @@ const Profile = () => {
             <Form
                 name="basic"
                 labelCol={{
-                    span: 8,
+                    span: 6,
                 }}
                 wrapperCol={{
                     span: 16,
@@ -104,7 +104,7 @@ const Profile = () => {
                 </Form.Item>
                 <Form.Item
                     wrapperCol={{
-                        offset: isMobile ? 0 : 8,
+                        offset: isMobile ? 0 : 6,
                         span: 16,
                     }}
                 >

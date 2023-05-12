@@ -29,7 +29,11 @@ const MyProducts = () => {
     const [dashboard, setDashboard] = useState(initialState);
 
     useEffect(() => {
-        setPrograms(sessionUser.programList);
+        if (sessionUser) {
+            setPrograms(sessionUser.programList);
+        } else {
+            fetchUser();
+        }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
@@ -52,12 +56,27 @@ const MyProducts = () => {
         }
     }
 
+    const fetchUser = async() => {
+        const user = await axios.get(
+            process.env.REACT_APP_API + "/university/get-user", {
+            headers: {
+                authToken: token,
+            },
+        });
+        if (user.data.err) {
+            toast.error(user.data.err);
+        } else {
+            setPrograms(user.data.programList && user.data.programList);
+        }
+    }
+
     return (
         <Layout>
             <MainHeader
                 defaultKey="4"
                 dashboard={dashboard}
                 setDashboard={setDashboard}
+                pathname={"/myprograms"}
             />
             <div
                 align="center"

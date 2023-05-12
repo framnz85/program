@@ -5,9 +5,12 @@ import { useNavigate } from "react-router-dom";
 
 import MainHeader from '../components/common/MainHeader';
 import MainFooter from '../components/common/MainFooter';
-import Dashboard from '../components/Dashboard';
-import EarningTable from '../components/EarningTable';
-import ReferralTable from '../components/ReferralTable';
+import Navigator from '../components/common/Navigator';
+import Dashboard from '../components/home/Dashboard';
+import EarningTable from '../components/home/EarningTable';
+import ReferralTable from '../components/home/ReferralTable';
+import LoginRewardTable from '../components/home/LoginRewardTable';
+import PostRewardTable from '../components/home/PostRewardTable';
 
 const initialState = {
     userid: "",
@@ -19,28 +22,25 @@ const initialState = {
 
 const Home = () => {
     const navigate = useNavigate();
+    const queryParams = new URLSearchParams(window.location.search);
     const pathToRedirect = sessionStorage.getItem("pathToRedirect");
+    const sessionUser = JSON.parse(sessionStorage.getItem("programUser"));
 
     if (pathToRedirect) {
         navigate(pathToRedirect, { replace: true });
     }
 
     const [dashboard, setDashboard] = useState(initialState);
-    const [tabMenu, setTabMenu] = useState(1);
+    const [tabMenu, setTabMenu] = useState(queryParams.get("tab") ? parseInt(queryParams.get("tab")) : 1);
     const [noRegBonus, setnoRegBonus] = useState(false);
-    const [noMessenger, setNoMessenger] = useState(false);
-    
-    const tabs = {
-        float: "left",
-        padding: "5px 10px",
-        borderTop: "1px solid #aaa",
-        borderLeft: "1px solid #aaa",
-        width: 120,
-        textAlign: "center",
-        cursor: "pointer",
-        borderTopRightRadius: 4,
-        borderTopLeftRadius: 4
-    }
+    // const [noMessenger, setNoMessenger] = useState(false);
+
+    const tabData = [
+        {key: 1, title: "Earnings"},
+        {key: 2, title: "Referrals"},
+        {key: 3, title: "Login"},
+        {key: 4, title: "Post"}
+    ]
 
     return (
         <Layout>
@@ -77,34 +77,37 @@ const Home = () => {
                         Claim Your 750 Pesos Bonus Here<br />
                         <h6>(Sent via Messenger)</h6>
                     </Button><br />
-                    {noMessenger && <p style={{ color: "red", border: "1px solid red", width: isMobile ? "100%" : 650 }}>
+                    {/* {noMessenger && <p style={{ color: "red", border: "1px solid red", width: isMobile ? "100%" : 650 }}>
                         We already sent your registration bonus to your email address. Kindly locate it in your email's inbox or on its spam folder. The subject is "Welcome to Clavstore University" and the sender is admin@clavstore.com
-                    </p>}
+                    </p>} */}
                     <Button
                         type="default"
                         htmlType="submit"
                         style={{
                             width: isMobile ? "100%" : 650,
-                            height: 40,
-                            fontSize: 16,
+                            height: isMobile ? 70 : 80,
+                            fontSize: isMobile ? 18 : 24,
                             marginBottom: 30
                         }}
-                        onClick={() => setNoMessenger(true)}
+                        onClick={() => window.open('/claim.html?name=' + encodeURI(sessionUser.name) + '&email=' + sessionUser.email, '_blank', 'noopener,noreferrer')}
                     >
-                        I don't have a messenger
+                        Claim 750 Thru Email Here
                     </Button>
                 </div>}
-                <div style={{borderBottom: "1px solid #aaa"}}>
-                    <div style={{...tabs, backgroundColor: tabMenu === 1 ? "#fff" : "#eee"}} onClick={() => setTabMenu(1)}>Earnings</div>
-                    <div style={{...tabs, borderRight: "1px solid #aaa", backgroundColor: tabMenu === 2 ? "#fff" : "#eee"}} onClick={() => setTabMenu(2)}>Referrals</div>
-                    <div style={{clear: "both"}}></div>
-                </div>
+                <Navigator
+                    tabMenu={tabMenu}
+                    setTabMenu={setTabMenu}
+                    tabData={tabData}
+                    width={120}
+                />
                 <br />
-                {tabMenu === 1 && <EarningTable setnoRegBonus={setnoRegBonus} />}
+                {tabMenu === 1 && <EarningTable setnoRegBonus={setnoRegBonus} setTabMenu={setTabMenu} />}
                 {tabMenu === 2 && <ReferralTable />}
+                {tabMenu === 3 && <LoginRewardTable />}
+                {tabMenu === 4 && <PostRewardTable />}
             </div>
 
-            <MainFooter />
+            <MainFooter setTabMenu={setTabMenu} />
         </Layout>
     );
 }

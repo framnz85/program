@@ -13,7 +13,7 @@ const PromoteCard = ({prom, type, program}) => {
     const [copyDesc, setCopyDesc] = useState("Copy Description");
 
     const downloadImage = (img) => {
-        saveAs(img);
+        saveAs(img, "", {autoBom: true} );
     }
 
     const copyClipboard = (num) => {
@@ -38,13 +38,11 @@ const PromoteCard = ({prom, type, program}) => {
                 width: isMobile ? "100%" : "23%",
                 marginRight: isMobile ? 0 : 20,
                 marginBottom: 20,
-                cursor: "pointer",
                 backgroundColor: "#fafafa"
             }}
             cover={
                 <div align="center">
                     {type === "image" ? <img
-                        onClick={() => downloadImage(`https://drive.google.com/uc?export=view&id=${prom.driveID}`)}
                         alt="Promote Clavstore University"
                         src={`https://drive.google.com/uc?export=view&id=${prom.driveID}`}
                         style={{width: "80%", height: "80%", paddingTop: 20}}
@@ -58,7 +56,7 @@ const PromoteCard = ({prom, type, program}) => {
                     <Button
                         icon={<DownloadOutlined />}
                         style={{width: 120}}
-                        onClick={() => downloadImage(`https://drive.google.com/uc?export=view&id=${prom.driveID}`, prom.driveID)}
+                        onClick={() => downloadImage(`https://drive.google.com/uc?export=view&id=${prom.driveID}`)}
                     >
                         Download
                     </Button>

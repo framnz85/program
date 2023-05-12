@@ -70,7 +70,7 @@ const ThankYou = () => {
                 </div>
                 <h2 style={{fontSize: isMobile ? "24px" : "32px", paddingTop: isMobile ? 25 : 15}}>Clavstore University</h2>
             </div><br /><br />
-            <h4>Congratulations on your P100 Bonus!!!</h4>
+            <h4>Congratulations on your P750 Bonus!!!</h4>
             <div align="left"
                 style={{
                     maxWidth: 450,
@@ -78,7 +78,7 @@ const ThankYou = () => {
                 }}
             >
                 {error ? <h3 style={{color: "red"}}>Error: {error}<br /><br /></h3> : <>
-                    <img src={process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/congrats750.gif"} alt="Congrats P300 Earnings" width="100%" />
+                    <img src={process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/congrats750.gif"} alt="Congrats P750 Earnings" width="100%" />
                     <br /><br />
 
                     By the way, we also send you the reward link to your email's inbox. Kindly check it.

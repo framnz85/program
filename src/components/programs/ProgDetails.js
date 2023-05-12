@@ -12,6 +12,8 @@ import NotEnrolled from './NotEnrolled';
 import PayInstruction from './PayInstruction';
 import Enrolled from './Enrolled';
 
+import { noImage } from '../common/uriImages';
+
 const initialState = {
     totalProducts: 0,
     totalCommission: 0,
@@ -22,6 +24,7 @@ const initialState = {
 const ProgDetails = () => {
     const navigate = useNavigate();
     const sessionUser = JSON.parse(sessionStorage.getItem("programUser"));
+    const queryParams = new URLSearchParams(window.location.search);
     const { slug } = useParams();
     
     const [user, setUser] = useState({});
@@ -100,6 +103,8 @@ const ProgDetails = () => {
                 defaultKey="3"
                 dashboard={dashboard}
                 setDashboard={setDashboard}
+                pathname={"/program/" + slug}
+                noRedirect={queryParams.get("noRedirect") === "1"}
             />
             <div
                 align="center"
@@ -111,14 +116,14 @@ const ProgDetails = () => {
             >
                 <div style={{display: isMobile ? "block" : "flex"}}>
                     <div align="center" style={{ width: isMobile ? "100%" : "50%" }}>
-                        <img src={program.image1 && process.env.REACT_APP_CLAVMALL_IMG + "/program_images/" + program.image1} width={isMobile ? "100%" : "80%"} alt={program.title} />
+                        <img src={program.image1 ? program.image1 : noImage} width={isMobile ? "100%" : "80%"} alt={program.title} />
                         {user && user.programList && user.programList.some((prog) => prog.progid._id === program._id && prog.status)
                             ? <Enrolled program={program} />
                             : user && user.programList && user.programList.some((prog) => prog.progid._id === program._id && !prog.status)
                                 ? <PayInstruction program={program} user={user} setUser={setUser} />
-                                : <NotEnrolled program={program} user={user} setUser={setUser} />
-                    }
-                        <Button
+                                : <NotEnrolled program={program} user={user} setUser={setUser} pathname={"/program/" + slug + "?noRedirect=1"} />
+                        }
+                        {queryParams.get("noRedirect") !== "1" && <Button
                             type="default"
                             size="large"
                             style={{
@@ -132,7 +137,7 @@ const ProgDetails = () => {
                             onClick={() => navigate(`/promote/${program.slug}`)}
                         >
                             Promote This Program
-                        </Button>
+                        </Button>}
                     </div>
                     <div align="left" style={{ width: isMobile ? "100%" : "50%", marginTop: isMobile ? 20 : 0}}>
                         <h2>{program.title} - {program.subtitle}</h2>
@@ -186,7 +191,7 @@ const ProgDetails = () => {
                 </div>
             </div>
 
-            <MainFooter />
+            <MainFooter noRedirect={queryParams.get("noRedirect") === "1"} />
         </Layout>
      );
 }

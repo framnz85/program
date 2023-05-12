@@ -3,6 +3,7 @@ import { Table } from 'antd';
 import { isMobile } from 'react-device-detect';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import NumberFormat from "react-number-format";
 
 const initialState = {
     pageSize: 10,
@@ -53,11 +54,16 @@ const ReferralTable = () => {
 
     const columns = isMobile ? [
         {
-            title: 'Data',
+            title: '',
             dataIndex: 'data',
             key: 'data',
         },
     ] : [
+        {
+            title: '#',
+            dataIndex: 'index',
+            key: 'index',
+        },
         {
             title: 'Name',
             dataIndex: 'name',
@@ -74,30 +80,52 @@ const ReferralTable = () => {
             key: 'date',
         },
         {
+            title: 'Commission',
+            dataIndex: 'recruitCommission',
+            key: 'recruitCommission',
+        },
+        {
             title: 'Status',
             dataIndex: 'confirmed',
             key: 'confirmed',
         }
     ];
 
-    const data = referrals ? referrals.map(refer => {
+    const data = referrals ? referrals.map((refer, index) => {
         const date = refer.createdAt && new Date(refer.createdAt);
+        const showIndex = index + ((showPage.current - 1) * showPage.pageSize) + 1;
         return refer ? isMobile ? {
             key: refer._id ? refer._id : "",
             data:
                 <>
+                    <b>#</b>{showIndex}<br />
                     <b>Name:</b> {refer.name ? refer.name : ""}<br />
                     <b>Email:</b> {refer.email ? refer.email : ""}<br />
                     <b>Date Registered:</b> {refer.createdAt ? date.toDateString() : ""}<br />
-                    <b>Confirmed:</b> {refer.confirmed ? <span style={{color: "green"}}>Confirmed</span> : <span style={{color: "red"}}>Unconfirmed</span>}<br />
+                    <b>Commission:</b> <NumberFormat
+                        value={refer.recruitCommission ? refer.recruitCommission : ""}
+                        displayType={"text"}
+                        thousandSeparator={true}
+                        prefix={"₱"}
+                    /><br />
+                    <b>Confirmed:</b> {refer.confirmed ? <span style={{ color: "green" }}>Confirmed</span> : <span style={{ color: "red" }}>Unconfirmed</span>}<br />
                 </>
             ,
         } : {
             key: refer._id ? refer._id : "",
+            index: showIndex,
             name: refer.name ? refer.name : "",
             email: refer.email ? refer.email : "",
             date: refer.createdAt ? date.toDateString() : "",
-            confirmed: refer.confirmed ? <span style={{color: "green"}}>Confirmed</span> : <span style={{color: "red"}}>Unconfirmed</span>,
+            recruitCommission: <div align="right" style={{ width: "50%" }}>
+                <NumberFormat
+                    value={refer.recruitCommission ? refer.recruitCommission : ""}
+                    displayType={"text"}
+                    thousandSeparator={true}
+                    prefix={"₱"}
+                />
+            </div>,
+            confirmed: refer.confirmed ? <span style={{color: "green"}}>Confirmed</span> : <span style={{color: "red"}}>Unconfirmed</span>
         } : {}
     }) : []
     

@@ -1,14 +1,50 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Card, Modal } from 'antd';
 import { useNavigate } from "react-router-dom";
 import { isMobile } from 'react-device-detect';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const { Meta } = Card;
 
 const CreateProgram = () => {
     const navigate = useNavigate();
+    const sessionUser = JSON.parse(sessionStorage.getItem("programUser"));
+    let token = localStorage.getItem("token");
+    if (!token) {
+        token = sessionStorage.getItem("token");
+    }
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [casyop, setCasyop] = useState(false);
+    
+    useEffect(() => {
+        if (sessionUser) {
+            checkCasyopEnroll(sessionUser.programList);
+        } else {
+            fetchUser();
+        }
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const checkCasyopEnroll = (program) => {
+        const result = program && program.filter(prog => prog.progid._id === "640c7fbc428b54c4120f1348");
+        if (result[0] && result[0].status) setCasyop(true);
+    }
+
+    const fetchUser = async() => {
+        const user = await axios.get(
+            process.env.REACT_APP_API + "/university/get-user", {
+            headers: {
+                authToken: token,
+            },
+        });
+        if (user.data.err) {
+            toast.error(user.data.err);
+        } else {
+            checkCasyopEnroll(user.data.programList && user.data.programList);
+        }
+    }
+
     const showModal = () => {
         setIsModalOpen(true);
     };
@@ -19,6 +55,11 @@ const CreateProgram = () => {
     const handleCancel = () => {
         setIsModalOpen(false);
     };
+
+    const createProgram = () => {
+        if (casyop) navigate("/myprogram/add")
+        else showModal();
+    }
 
     return ( 
         <>
@@ -39,7 +80,7 @@ const CreateProgram = () => {
                         style={{border: "1px solid #eeeeee"}}
                     />
                 }
-                onClick={() => showModal()}
+                onClick={() => createProgram()}
             >
                 <Meta
                     title={<div align="center">+ Create New</div>}

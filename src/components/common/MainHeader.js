@@ -10,7 +10,7 @@ import Withdraw from '../account/Withdraw';
 
 const { Header } = Layout;
 
-const MainHeader = ({defaultKey, dashboard, setDashboard, noRegBonus = false}) => {
+const MainHeader = ({defaultKey, dashboard, setDashboard, noRegBonus = false, pathname = "", noRedirect = false}) => {
     const navigate = useNavigate();
     const queryParams = new URLSearchParams(window.location.search);
     let token = localStorage.getItem("token");
@@ -26,9 +26,15 @@ const MainHeader = ({defaultKey, dashboard, setDashboard, noRegBonus = false}) =
         getUserDetails();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const getUserDetails = async() => {
+    const getUserDetails = async () => {
         if (!token) {
-            navigate("/login");
+            if (!noRedirect) {
+                if (pathname.length > 0) {
+                    navigate("/login", { state: { from: pathname } });
+                } else {
+                    navigate("/login");
+                }
+            }
         } else {
             const user = await axios.get(
                 process.env.REACT_APP_API + "/university/get-user", {
@@ -66,18 +72,23 @@ const MainHeader = ({defaultKey, dashboard, setDashboard, noRegBonus = false}) =
                     process.env.REACT_APP_API + "/university/dashboard/" + user.data._id
                 );
 
-                const totalCommission = earning.data.sumCommission[0] ? earning.data.sumCommission[0].sum : 0;
-                const totalWithdrawn = earning.data.sumWithdraw[0] ? earning.data.sumWithdraw[0].sum : 0;
-                const totalRemaining = totalCommission + totalWithdrawn;
+                if (earning.data.err) {
+                    toast.error(earning.data.err);
+                } else {
+                    const totalCommission = earning.data.totalCommission;
+                    const totalWithdrawn = earning.data.totalWithdraw;
+                    const totalRemaining = totalCommission + totalWithdrawn;
+                    
+                    setDashboard({
+                        ...dashboard,
+                        userid: user.data._id,
+                        totalProducts: earning.data.totalProducts,
+                        totalCommission,
+                        totalWithdrawn,
+                        totalRemaining
+                    });
+                }
 
-                setDashboard({
-                    ...dashboard,
-                    userid: user.data._id,
-                    totalProducts: earning.data.totalProducts,
-                    totalCommission,
-                    totalWithdrawn,
-                    totalRemaining
-                });
             }
         }
         const refid = queryParams.get("refid");
@@ -93,7 +104,10 @@ const MainHeader = ({defaultKey, dashboard, setDashboard, noRegBonus = false}) =
         }
     }
 
-    const headerNav = [
+    const headerNav = isMobile ? [
+        { key: 7, label: "Withdraw" },
+        { key: 5, label: "Premium", destination: "/premium" },
+    ] : [
         { key: 2, label: "Home", destination: "/home" },
         { key: 3, label: "Programs", destination: "/programs" },
         { key: 4, label: "My Programs", destination: "/myprograms" },
@@ -120,10 +134,11 @@ const MainHeader = ({defaultKey, dashboard, setDashboard, noRegBonus = false}) =
         <Layout>
             <Header
                 style={{
-                position: 'sticky',
-                top: 0,
-                zIndex: 1,
-                width: '100%',
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1,
+                    width: '100%',
+                    paddingLeft: isMobile ? 10 : ""
                 }}
             >
                 <Menu
@@ -145,7 +160,7 @@ const MainHeader = ({defaultKey, dashboard, setDashboard, noRegBonus = false}) =
                 </h5>}
             </Header>
 
-            {sessionUser._id && <NextSteps
+            {!noRedirect && sessionUser._id && <NextSteps
                 sessionUser={sessionUser}
                 stepModal={stepModal}
                 showStepModal={showStepModal}

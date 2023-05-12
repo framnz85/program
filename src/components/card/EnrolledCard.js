@@ -4,6 +4,8 @@ import { EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
 import { isMobile } from 'react-device-detect';
 
+import { noImage } from '../common/uriImages';
+
 const { Meta } = Card;
 
 const EnrolledCard = ({prog}) => {
@@ -20,7 +22,7 @@ const EnrolledCard = ({prog}) => {
             cover={
                 <img
                     alt={prog.progid.title ? prog.progid.title : ""}
-                    src={prog.progid.image1 ? process.env.REACT_APP_CLAVMALL_IMG + "/program_images/" + prog.progid.image1 : ""}
+                    src={prog.progid.image1 ? prog.progid.image1 : noImage}
                 />
             }
         >

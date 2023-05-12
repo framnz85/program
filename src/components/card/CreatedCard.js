@@ -4,6 +4,8 @@ import { EditOutlined } from '@ant-design/icons';
 import { useNavigate } from "react-router-dom";
 import { isMobile } from 'react-device-detect';
 
+import { noImage } from '../common/uriImages';
+
 const { Meta } = Card;
 
 const CreatedCard = ({prog}) => {
@@ -20,7 +22,7 @@ const CreatedCard = ({prog}) => {
             cover={
                 <img
                     alt={prog.title ? prog.title : ""}
-                    src={prog.image1 ? process.env.REACT_APP_CLAVMALL_IMG + "/program_images/" + prog.image1 : ""}
+                    src={prog.image1 ? prog.image1 : noImage}
                 />
             }
         >

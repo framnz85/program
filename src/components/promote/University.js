@@ -2,7 +2,8 @@ import React, {useState, useEffect} from 'react'
 import { isMobile } from 'react-device-detect';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { Pagination, Radio } from 'antd';
+import { Pagination, Radio, Space, Select } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 
 import PromoteCard from '../card/PromoteCard';
 
@@ -11,7 +12,7 @@ const initialState = {
     pageSize: 8,
     current: 1,
     sortkey: "item",
-    sort: 1,
+    sort: -1,
     total: 0,
     type: "all"
 }
@@ -19,12 +20,14 @@ const initialState = {
 const University = () => {
     const [promote, setPromote] = useState([]);
     const [showPage, setShowPage] = useState(initialState);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         fetchPromote(showPage.current, showPage.pageSize, showPage.type);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const fetchPromote = async (page, pageSize, type) => {
+        setLoading(true);
         const result = await axios.post(
             process.env.REACT_APP_API + "/university/promote",
             { ...showPage, pageSize, current: page, type },
@@ -39,23 +42,64 @@ const University = () => {
                 current: page,
                 total: result.data.total,
                 type
-            })
+            });
+            setLoading(false);
         }
     }
     return ( 
         <>
             <div align="center" style={{ marginTop: 20 }}>
-                <Radio.Group
-                    onChange={
-                        e => fetchPromote(showPage.page, showPage.pageSize, e.target.value)
-                    }
-                    value={showPage.type}
+                {!isMobile && <Space
+                    style={{
+                    marginBottom: 24,
+                    }}
                 >
-                    <Radio value={"all"}>All</Radio>
-                    <Radio value={"image"}>Images</Radio>
-                    <Radio value={"video"}>Videos</Radio>
-                    <Radio value={"training"}>Trainings</Radio>
-                </Radio.Group><br /><br />
+                    <Radio.Group value={showPage.type} onChange={e => fetchPromote(showPage.page, showPage.pageSize, e.target.value)}>
+                        <Radio.Button value="all">All</Radio.Button>
+                        <Radio.Button value="image">Images (Newsfeeds)</Radio.Button>
+                        <Radio.Button value="story">Images (Stories)</Radio.Button>
+                        <Radio.Button value="video">Videos (Newsfeeds)</Radio.Button>
+                        <Radio.Button value="short">Tiktok, Reels, Shorts</Radio.Button>
+                        <Radio.Button value="training">Videos (Training)</Radio.Button>
+                    </Radio.Group>
+                </Space>}
+
+                {isMobile && <Select
+                    defaultValue={showPage.type}
+                    style={{
+                        width: "100%",
+                    }}
+                    onChange={value => fetchPromote(showPage.page, showPage.pageSize, value)}
+                    options={[
+                        {
+                            value: 'all',
+                            label: 'All',
+                        },
+                        {
+                            value: 'image',
+                            label: 'Images (Newsfeeds)',
+                        },
+                        {
+                            value: 'story',
+                            label: 'Images (Stories)',
+                        },
+                        {
+                            value: 'video',
+                            label: 'Videos (Newsfeeds)',
+                        },
+                        {
+                            value: 'short',
+                            label: 'Tiktok, Reels, Shorts',
+                        },
+                        {
+                            value: 'training',
+                            label: 'Videos (Training)',
+                        },
+                    ]}
+                />}
+                
+                
+                <div style={{height: 30}}>{loading && <LoadingOutlined />}</div>
                 
                 <Pagination
                     total={showPage.total}

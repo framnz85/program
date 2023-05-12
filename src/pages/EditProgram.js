@@ -8,6 +8,7 @@ import { useNavigate  } from "react-router-dom";
 
 import MainHeader from '../components/common/MainHeader';
 import MainFooter from '../components/common/MainFooter';
+import Navigator from '../components/common/Navigator';
 import ProgDetails from '../components/myprogs/ProgDetails';
 import SalesPage from '../components/myprogs/SalesPage';
 
@@ -75,17 +76,10 @@ const EditProgram = () => {
         }
     }
 
-    const tabs = {
-        float: "left",
-        padding: "5px 10px",
-        borderTop: "1px solid #aaa",
-        borderLeft: "1px solid #aaa",
-        width: 150,
-        textAlign: "center",
-        cursor: "pointer",
-        borderTopRightRadius: 4,
-        borderTopLeftRadius: 4
-    }
+    const tabData = [
+        {key: 1, title: "Program Details"},
+        {key: 2, title: "Sales Page"}
+    ]
 
     return (
         <Layout>
@@ -101,11 +95,12 @@ const EditProgram = () => {
                     marginTop: 10
                 }}
             >
-                <div style={{borderBottom: "1px solid #aaa"}}>
-                    <div style={{...tabs, backgroundColor: tabMenu === 1 ? "#fff" : "#eee"}} onClick={() => setTabMenu(1)}>Program Details</div>
-                    <div style={{...tabs, borderRight: "1px solid #aaa", backgroundColor: tabMenu === 2 ? "#fff" : "#eee"}} onClick={() => setTabMenu(2)}>Sales Page</div>
-                    <div style={{clear: "both"}}></div>
-                </div>
+                <Navigator
+                    tabMenu={tabMenu}
+                    setTabMenu={setTabMenu}
+                    tabData={tabData}
+                    width={150}
+                />
 
                 {program._id && tabMenu === 1 && <ProgDetails
                     program={program}

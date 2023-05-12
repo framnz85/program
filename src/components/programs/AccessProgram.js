@@ -21,6 +21,10 @@ const AccessProgram = () => {
     const queryParams = new URLSearchParams(window.location.search);
     const sessionUser = JSON.parse(sessionStorage.getItem("programUser"));
     const { slug } = useParams();
+    let token = localStorage.getItem("token");
+    if (!token) {
+        token = sessionStorage.getItem("token");
+    }
     
     const [values, setValues] = useState({});
     const [user, setUser] = useState({});
@@ -29,7 +33,11 @@ const AccessProgram = () => {
 
     useEffect(() => {
         fetchProgram();
-        setUser(sessionUser);
+        if (sessionUser) {
+            setUser(sessionUser);
+        } else {
+            fetchUser();
+        }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const fetchProgram = async () => {
@@ -49,12 +57,27 @@ const AccessProgram = () => {
         }
     }
 
+    const fetchUser = async() => {
+        const user = await axios.get(
+            process.env.REACT_APP_API + "/university/get-user", {
+            headers: {
+                authToken: token,
+            },
+        });
+        if (user.data.err) {
+            toast.error(user.data.err);
+        } else {
+            setUser(user.data);
+        }
+    }
+
     return ( 
-        <Layout>{console.log(values)}
+        <Layout>
             <MainHeader
                 defaultKey="3"
                 dashboard={dashboard}
                 setDashboard={setDashboard}
+                pathname={"/access/" + slug}
             />
             <div
                 align="center"
@@ -65,7 +88,7 @@ const AccessProgram = () => {
                 }}
             >
                 <h2>{program.title} - {program.subtitle}</h2>
-                {user.programList && user.programList.some(prog => prog.progid._id === program._id && prog.status) ? <div align="left" style={{
+                {user && user.programList && user.programList.some(prog => prog.progid._id === program._id && prog.status) ? <div align="left" style={{
                     display: "flex",
                     flexDirection: isMobile ? "column-reverse" : "row",
                 }}>

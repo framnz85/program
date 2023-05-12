@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import { isMobile } from 'react-device-detect';
 
+import { premium } from '../common/currency';
+
 const Paypal = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/paypal.png";
 const BDO = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/bdo.png";
 const BPI = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/bpi.png";
@@ -24,12 +26,12 @@ const PayInstruction = ({payment, setPayment, setPremium}) => {
     const [success, setSuccess] = useState(false);
 
     useEffect(() => {
-        setAmount(payment === "pal" ? 120 : 5990);
+        setAmount(payment === "pal" ? parseInt(premium.dollar) : parseInt(premium.peso).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const onChange = async (e) => {
         setPayment(e.target.value);
-        setAmount(e.target.value === "pal" ? 120 : 5990);
+        setAmount(e.target.value === "pal" ? parseInt(premium.dollar) : parseInt(premium.peso).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
     };
 
     const handleApprove = async (sellerTxnID) => {
@@ -77,7 +79,7 @@ const PayInstruction = ({payment, setPayment, setPremium}) => {
                         Total Amount to Pay Now: <b>{payment === "pal" ? "$" : "₱"}{amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</b>
                         {payment !== "pal" && <h6>
                             WARNING: Send your payments only to the Account Number and Account Name shown below.
-                            We are not liable if payment are not sent directly to our accounts.
+                            We are not liable for lost payment that are not sent directly to our accounts.
                         </h6>}
                     </span><br /><br />
                     <Radio.Group onChange={onChange} value={payment && payment.toString()}>

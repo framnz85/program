@@ -7,10 +7,10 @@ import { isMobile } from 'react-device-detect';
 
 const ClavstoreUniversity = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/clavstoreuniversity.png"
 
-const Register = () => {
+const Register = ({regFromProg = false, pathname = ""}) => {
     const navigate = useNavigate();
     const location = useLocation();
-    const pathToRedirect = location && location.state && location.state.from;
+    const pathToRedirect = pathname && pathname.length > 0 ? pathname : location && location.state ? location.state.from : "";
     const queryParams = new URLSearchParams(window.location.search);
     const initRefid = "63fa250056d101375f142fe3";
     
@@ -46,7 +46,11 @@ const Register = () => {
                 sessionStorage.setItem("programUser", JSON.stringify(user.data));
                 localStorage.setItem("token", token.data);
                 sessionStorage.setItem("token", token.data);
-                navigate("/infocheck");
+                if (regFromProg) {
+                    window.location.reload();
+                } else {
+                    navigate("/home");
+                }
             }
         } else {
             toast.error("No token has produced.");
@@ -88,7 +92,7 @@ const Register = () => {
         <div align="center" style={{padding: 20}}>
             <div
                 style={{
-                    marginTop: isMobile ? "20px" : "80px",
+                    marginTop: regFromProg || isMobile ? "20px" : "80px",
                     color: "#009A57",
                     display: "flex",
                     justifyContent: "center",
@@ -211,7 +215,7 @@ const Register = () => {
                     </Form.Item>}
 
                     <div align="right">
-                        <Link to="/login" state={{ from: pathToRedirect ? pathToRedirect : "/home" }} style={{paddingTop: 5}}>Login Now</Link><br /><br />
+                        <Link to="/login" state={{ from: pathToRedirect && pathToRedirect.length > 0 ? pathToRedirect : "/home" }} style={{paddingTop: 5}}>Login Now</Link><br /><br />
                     </div>
 
                     <Form.Item

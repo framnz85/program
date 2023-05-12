@@ -38,17 +38,9 @@ const SalesProgram = () => {
         }
     }
 
-    const handleEnroll = () => {
-        if (token) {
-            navigate('../program/' + program.slug);
-        } else {
-            navigate("/login", { state: { from: "/program/" + program.slug }});
-        }
-    }
-
     return ( 
         <div align="center">
-            <div style={{ width: "80%", padding: 20 }} >
+            <div style={{ width: isMobile ? "100%" : "80%", padding: 20 }} >
                 <ReactQuill
                     value={program.salesPage ? program.salesPage : ""}
                     readOnly={true}
@@ -66,7 +58,7 @@ const SalesProgram = () => {
                     marginBottom: 50,
                     width: isMobile ? "100%" : "50%",
                 }}
-                onClick={handleEnroll}
+                onClick={() => navigate('../program/' + program.slug + "?noRedirect=1")}
             >
                 Click Here To Enroll
             </Button><br />

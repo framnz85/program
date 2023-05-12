@@ -1,8 +1,8 @@
 import React, {useState} from 'react'
 import { Layout } from 'antd';
-import { isMobile } from 'react-device-detect';
 
 import MainHeader from '../components/common/MainHeader';
+import Navigator from '../components/common/Navigator';
 import Profile from '../components/account/Profile';
 import Security from '../components/account/Security';
 import Withdraw from '../components/account/Withdraw';
@@ -15,20 +15,19 @@ const initialState = {
 }
 
 const Account = () => {
+    let token = localStorage.getItem("token");
+    if (!token) {
+        token = sessionStorage.getItem("token");
+    }
+    
     const [tabMenu, setTabMenu] = useState(1);
     const [dashboard, setDashboard] = useState(initialState);
 
-    const tabs = {
-        float: "left",
-        padding: "5px 10px",
-        borderTop: "1px solid #aaa",
-        borderLeft: "1px solid #aaa",
-        width: isMobile ? 95 : 120,
-        textAlign: "center",
-        cursor: "pointer",
-        borderTopRightRadius: 4,
-        borderTopLeftRadius: 4
-    }
+    const tabData = [
+        {key: 1, title: "Profile"},
+        {key: 2, title: "Security"},
+        {key: 3, title: "Withdraw"}
+    ]
 
     return ( 
         <Layout>
@@ -38,24 +37,24 @@ const Account = () => {
                 setDashboard={setDashboard}
             />
                 
-            <div
+            {token && <div
                 style={{
                     padding: 24,
                     backgroundColor: "#ffffff",
                     marginTop: 10
                 }}
             >
-                <div style={{borderBottom: "1px solid #aaa"}}>
-                    <div style={{...tabs, backgroundColor: tabMenu === 1 ? "#fff" : "#eee"}} onClick={() => setTabMenu(1)}>Profile</div>
-                    <div style={{...tabs, borderRight: "1px solid #aaa", backgroundColor: tabMenu === 2 ? "#fff" : "#eee"}} onClick={() => setTabMenu(2)}>Security</div>
-                    <div style={{...tabs, borderRight: "1px solid #aaa", backgroundColor: tabMenu === 3 ? "#fff" : "#eee"}} onClick={() => setTabMenu(3)}>Withdraw</div>
-                    <div style={{clear: "both"}}></div>
-                </div>
+                <Navigator
+                    tabMenu={tabMenu}
+                    setTabMenu={setTabMenu}
+                    tabData={tabData}
+                    width={120}
+                />
 
                 {tabMenu === 1 && <Profile />}
                 {tabMenu === 2 && <Security />}
                 {tabMenu === 3 && <Withdraw dashboard={dashboard} />}
-            </div>
+            </div>}
         </Layout>
      );
 }

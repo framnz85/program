@@ -6,6 +6,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 import RegisterExist from "./RegisterExist"
+import Register from '../../pages/Register';
 
 const Paypal = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/paypal.png";
 const BDO = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/bdo.png";
@@ -14,7 +15,7 @@ const Unionbank = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/union.png
 const Gcash = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/gcash.png";
 const Maya = process.env.REACT_APP_CLAVMALL_IMG + "/funnel_images/maya.png";
 
-const NotEnrolled = ({program, user, setUser}) => {
+const NotEnrolled = ({program, user, setUser, pathname = ""}) => {
     const navigate = useNavigate();
     let token = localStorage.getItem("token");
     if (!token) {
@@ -98,12 +99,12 @@ const NotEnrolled = ({program, user, setUser}) => {
                     marginTop: 25,
                     width: isMobile ? "100%" : "80%",
                 }}
-                onClick={() => navigate(`/${program.saleSlug ? "p/" + program.saleSlug : ""}?refid=${user._id}`)}
+                onClick={() => navigate(`/${program.saleSlug ? "p/" + program.saleSlug : ""}?refid=${user && user._id}`)}
             >
                 See The Full Details
             </Button>}
 
-            <Modal
+            {token ? <Modal
                 title="Enroll To This Program?"
                 open={isModalOpen}
                 onOk={handleOk}
@@ -141,7 +142,14 @@ const NotEnrolled = ({program, user, setUser}) => {
                     </Radio.Group>}
                     <br />
                 </div>
-            </Modal>
+            </Modal> : <Modal
+                title="Registration"
+                open={isModalOpen}
+                onCancel={handleCancel}
+                footer={null}
+            >
+                <Register regFromProg={true} pathname={pathname} />
+            </Modal>}
             {program
                 && program._id === "640c66fd8d23ede1246298de"
                 && <RegisterExist

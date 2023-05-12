@@ -1,16 +1,27 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button, Form, Input, Select } from 'antd';
 import { isMobile } from 'react-device-detect';
 import slugify from 'react-slugify';
 import { toast } from 'react-toastify';
 
+import UploadImage from './UploadImage';
+
 import { currency } from '../common/currency';
+import { noImage } from '../common/uriImages';
 
 const ProgDetails = ({program, setProgram, handleSubmit}) => {
+    const [image, setImage] = useState(noImage);
+    const [imageOk, setImageOk] = useState(false);
+
+    useEffect(() => {
+        setImage(program.image1 ? program.image1 : noImage)
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    
     const onFinish = (values) => {
-        setProgram({ ...program, ...values });
-        handleSubmit({ ...program, ...values });
+        setProgram({ ...program, ...values, image1: imageOk ? image : noImage });
+        handleSubmit({ ...program, ...values, image1: imageOk ? image : noImage });
     };
+    
     const onFinishFailed = (errorInfo) => {
         errorInfo.errorFields.map(field => {
             return toast.error(field.errors[0])
@@ -18,7 +29,12 @@ const ProgDetails = ({program, setProgram, handleSubmit}) => {
     };
     
     return ( 
-        <div align="center" style={{padding: 40}}>
+        <div align="center" style={{ padding: 40 }}>
+            <UploadImage
+                image={image}
+                setImage={setImage}
+                setImageOk={setImageOk}
+            />
             <Form
                 name="basic"
                 labelCol={{
@@ -204,7 +220,7 @@ const ProgDetails = ({program, setProgram, handleSubmit}) => {
                 </Form.Item>
                 <Form.Item
                     wrapperCol={{
-                        offset: isMobile ? 0 : 8,
+                        offset: isMobile ? 0 : 5,
                         span: 16,
                     }}
                 >

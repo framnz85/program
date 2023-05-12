@@ -3,16 +3,17 @@ import { Table } from 'antd';
 import { isMobile } from 'react-device-detect';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import NumberFormat from "react-number-format";
 
 const initialState = {
     pageSize: 10,
     current: 1,
-    sortkey: "createdAt",
+    sortkey: "updatedAt",
     sort: -1,
     total: 0,
 }
 
-const EarningTable = ({setnoRegBonus}) => {
+const EarningTable = ({setnoRegBonus, setTabMenu}) => {
     let token = localStorage.getItem("token");
     if (!token) {
         token = sessionStorage.getItem("token");
@@ -42,7 +43,7 @@ const EarningTable = ({setnoRegBonus}) => {
             toast.error(result.data.err);
         }else{
             const earningsData = [...earnings, ...result.data.earnings];
-            const regBonusCheck = earningsData.map(earn => earn.productName === "Registration Bonus");
+            const regBonusCheck = earningsData.filter(earn => earn.productName === "Registration Bonus");
 
             setnoRegBonus(result.data.earningsTotal < 10 && regBonusCheck.length < 1);
             setEarnings(result.data.earnings);
@@ -57,11 +58,16 @@ const EarningTable = ({setnoRegBonus}) => {
 
     const columns = isMobile ? [
         {
-            title: 'Data',
+            title: '',
             dataIndex: 'data',
             key: 'data',
         },
     ] : [
+        {
+            title: '#',
+            dataIndex: 'index',
+            key: 'index',
+        },
         {
             title: 'Name',
             dataIndex: 'name',
@@ -78,11 +84,6 @@ const EarningTable = ({setnoRegBonus}) => {
             key: 'product',
         },
         {
-            title: 'Amount',
-            dataIndex: 'amount',
-            key: 'amount',
-        },
-        {
             title: 'Commission',
             dataIndex: 'commission',
             key: 'commission',
@@ -94,28 +95,61 @@ const EarningTable = ({setnoRegBonus}) => {
         },
     ];
 
-    const data = earnings ? earnings.map(earn =>
+    const data = earnings ? earnings.map((earn, index) =>
     {
+        const showIndex = index + ((showPage.current - 1) * showPage.pageSize) + 1;
         return earn ? 
             isMobile ? {
                     key: earn._id ? earn._id : "",
                     data:
                         <>
+                            <b>#</b>{showIndex}<br />
                             <b>Name:</b> {earn.customer && earn.customer.name}<br />
                             <b>Email:</b> {earn.customer && earn.customer.email}<br />
-                            <b>Product:</b> {earn.product && earn.product.title ? earn.product.title : earn.productName ? earn.productName : ""}<br />
-                            <b>Amount:</b> {earn.amount ? earn.amount : ""}<br />
-                            <b>Commission:</b> {earn.commission ? earn.commission : ""}<br />
+                            <b>Product:</b> {earn.product && earn.product.title ? earn.product.title : earn.productName ? <div>
+                                {earn.productName}
+                                {earn.productName === "Recruitment Reward" && <>
+                                    (<span style={{ cursor: "pointer", color: "blue" }} onClick={() => setTabMenu(2)}>See Details</span>)
+                                </>}
+                                {earn.productName === "Login Reward" && <>
+                                    (<span style={{ cursor: "pointer", color: "blue" }} onClick={() => setTabMenu(3)}>See Details</span>)
+                                </>}
+                                {earn.productName === "Post Reward" && <>
+                                    (<span style={{ cursor: "pointer", color: "blue" }} onClick={() => setTabMenu(4)}>See Details</span>)
+                                </>}
+                                </div> : ""}<br />
+                            <b>Commission:</b> <NumberFormat
+                                value={earn.commission ? earn.commission : ""}
+                                displayType={"text"}
+                                thousandSeparator={true}
+                                prefix={"₱"}
+                            /><br />
                             <b>Status:</b> {earn.status ? <span style={{color: "green"}}>Approved</span> : <span style={{color: "red"}}>Pending</span>}<br />
                         </>
                     ,
                 } : {
                     key: earn._id ? earn._id : "",
+                    index: showIndex,
                     name: earn.customer && earn.customer.name,
                     email: earn.customer && earn.customer.email,
-                    product: earn.product && earn.product.title ? earn.product.title : earn.productName ? earn.productName : "",
-                    amount: earn.amount ? earn.amount : earn.monthlyAmount ? earn.monthlyAmount : "",
-                    commission: earn.commission ? earn.commission : "",
+                    product: earn.product && earn.product.title ? earn.product.title : earn.productName ? <div>
+                        {earn.productName}{" "}
+                        {earn.productName === "Recruitment Reward" && <>
+                            (<span style={{ cursor: "pointer", color: "blue" }} onClick={() => setTabMenu(2)}>See Details</span>)
+                        </>}
+                        {earn.productName === "Login Reward" && <>
+                            (<span style={{ cursor: "pointer", color: "blue" }} onClick={() => setTabMenu(3)}>See Details</span>)
+                        </>}
+                        {earn.productName === "Post Reward" && <>
+                            (<span style={{ cursor: "pointer", color: "blue" }} onClick={() => setTabMenu(4)}>See Details</span>)
+                        </>}
+                    </div> : "",
+                    commission: <NumberFormat
+                            value={earn.commission ? earn.commission : ""}
+                            displayType={"text"}
+                            thousandSeparator={true}
+                            prefix={"₱"}
+                        />,
                     status: earn.status ? <span style={{color: "green"}}>Approved</span> : <span style={{color: "red"}}>Pending</span>
                 }
             : {}
