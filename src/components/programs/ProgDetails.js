@@ -145,7 +145,7 @@ const ProgDetails = () => {
                             <span style={{ color: "darkorange" }}>{program.discountPrice === "Free" ? program.discountPrice : <>₱{program.discountPrice && program.discountPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</>}</span>{" "}
                             <span style={{textDecorationLine: "line-through"}}>₱{program.price && program.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</span>
                         </h4>
-                        <p>{program.description}</p><br />
+                        <p style={{whiteSpace: 'pre-line'}}>{program.description}</p><br />
                         <h4>Commission Table</h4>
                         {program.discountPrice === "Free" ?
                             <p>Refer this training to others and if they upgrade to Premium, you will earn as follows:</p> : 

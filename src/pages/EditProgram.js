@@ -68,7 +68,6 @@ const EditProgram = () => {
                 toast.error(result.data.err);
             } else {
                 toast.success("Update saved!!!");
-                navigate("/myprogram/edit/" + progToSubmit.slug)
             }
         } else {
             toast.error("Sorry! You are not the owner of that program.")

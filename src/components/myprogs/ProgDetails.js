@@ -14,7 +14,8 @@ const ProgDetails = ({program, setProgram, handleSubmit}) => {
     const [imageOk, setImageOk] = useState(false);
 
     useEffect(() => {
-        setImage(program.image1 ? program.image1 : noImage)
+        setImage(program.image1 ? program.image1 : noImage);
+        setImageOk(program.image1 ? true : false);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
     
     const onFinish = (values) => {
