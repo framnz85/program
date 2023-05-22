@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useEffect } from "react";
+import React, { lazy, Suspense, useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import { LoadingOutlined } from "@ant-design/icons";
 import { ToastContainer, toast } from 'react-toastify';
@@ -43,6 +43,8 @@ function App() {
   if (!token) {
       token = sessionStorage.getItem("token");
   }
+
+  const [showTab, setShowTab] = useState(true);
   
   useEffect(() => {
     if (token) {
@@ -148,7 +150,7 @@ function App() {
           <Route exact path="/myprograms" element={<MyPrograms />} />
           <Route exact path="/myprogram/add" element={<AddProgram />} />
           <Route exact path="/myprogram/edit/:slug" element={<EditProgram />} />
-          <Route exact path="/p/:slug" element={<SalesProgram />} />
+          <Route exact path="/p/:slug" element={<SalesProgram setShowTab={setShowTab} />} />
           <Route exact path="/promote" element={<Promote />} />
           <Route exact path="/promote/:slug" element={<Promote />} />
           <Route exact path="/premium" element={<Premium />} />
@@ -166,7 +168,7 @@ function App() {
           <Route exact path="p/ogpapay" element={<OgpaPay />} />
         </Routes>
       </Suspense>
-      <TabBottom notifyUser={notifyUser} checkNotification={checkNotification} />
+      {showTab && <TabBottom notifyUser={notifyUser} checkNotification={checkNotification} />}
       <ToastContainer />
     </div>
   );

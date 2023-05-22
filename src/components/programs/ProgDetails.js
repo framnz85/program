@@ -26,6 +26,10 @@ const ProgDetails = () => {
     const sessionUser = JSON.parse(sessionStorage.getItem("programUser"));
     const queryParams = new URLSearchParams(window.location.search);
     const { slug } = useParams();
+    let token = localStorage.getItem("token");
+    if (!token) {
+        token = sessionStorage.getItem("token");
+    }
     
     const [user, setUser] = useState({});
     const [copied, setCopied] = useState("Copy to Clipboard");
@@ -34,7 +38,11 @@ const ProgDetails = () => {
 
     useEffect(() => {
         fetchProgram();
-        setUser(sessionUser);
+        if (sessionUser) {
+            setUser(sessionUser);
+        } else {
+            fetchUser();
+        }
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const fetchProgram = async () => {
@@ -45,6 +53,20 @@ const ProgDetails = () => {
             toast.error(result.data.err);
         } else {
             setProgram(result.data)
+        }
+    }
+
+    const fetchUser = async() => {
+        const user = await axios.get(
+            process.env.REACT_APP_API + "/university/get-user", {
+            headers: {
+                authToken: token,
+            },
+        });
+        if (user.data.err) {
+            toast.error(user.data.err);
+        } else {
+            setUser(user.data);
         }
     }
 

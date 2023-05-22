@@ -1,13 +1,12 @@
 import React, {useState, useEffect} from 'react'
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Button } from 'antd';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
 import { isMobile } from 'react-device-detect';
 
-const SalesProgram = () => {
-    const navigate = useNavigate();
+const SalesProgram = ({setShowTab}) => {
     const { slug } = useParams();
     const queryParams = new URLSearchParams(window.location.search);
     let token = localStorage.getItem("token");
@@ -21,20 +20,28 @@ const SalesProgram = () => {
         localStorage.setItem("refid", refid);
     }
     
-    const [program, setProgram] = useState({});
+    const [salesPage, setSalesPage] = useState({});
     
     useEffect(() => {
         fetchProgram();
+        setShowTab(false);
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const fetchProgram = async () => {
-        const result = await axios.get(
+        const program = await axios.get(
             process.env.REACT_APP_API + "/university/program/" + slug
         );
-        if (result.data.err) {
-            toast.error(result.data.err);
-        } else {
-            setProgram(result.data);
+        if (program.data.err) {
+            toast.error(program.data.err);
+        }else{
+            const result = await axios.get(
+                process.env.REACT_APP_API + "/university/program-sales/" + program.data._id
+            );
+            if (result.data.err) {
+                toast.error(result.data.err);
+            } else {
+                setSalesPage(result.data.salesPage);
+            }
         }
     }
 
@@ -42,7 +49,7 @@ const SalesProgram = () => {
         <div align="center">
             <div style={{ width: isMobile ? "100%" : "80%", padding: 20 }} >
                 <ReactQuill
-                    value={program.salesPage ? program.salesPage : ""}
+                    value={salesPage ? salesPage : ""}
                     readOnly={true}
                     modules={{ toolbar: [] }}
                 />
@@ -51,16 +58,16 @@ const SalesProgram = () => {
                 type="primary"
                 size="large"
                 style={{
-                    height: 70,
-                    fontSize: 24,
+                    height: isMobile ? 50 : 70,
+                    fontSize: isMobile ? 20 : 24,
                     paddingLeft: 40,
                     paddingRight: 40,
                     marginBottom: 50,
-                    width: isMobile ? "100%" : "50%",
+                    width: isMobile ? "90%" : "50%",
                 }}
-                onClick={() => navigate('../program/' + program.slug + "?noRedirect=1")}
+                onClick={() => window.open("../program/" + slug + "?noRedirect=1", "_parent")}
             >
-                Click Here To Enroll
+                Click Here To Avail The Program
             </Button><br />
         </div>
      );
