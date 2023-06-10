@@ -17,6 +17,7 @@ const SalesPage = ({ program }) => {
   }
 
   const [values, setValues] = useState({
+    saleid: "",
     progid: program._id,
     owner: program.owner,
   });
@@ -40,6 +41,7 @@ const SalesPage = ({ program }) => {
         if (sessionUser._id === program.owner) {
           setValues({
             ...values,
+            saleid: result.data._id ? result.data._id : "",
             progid: result.data.progid ? result.data.progid : "",
             owner: result.data.owner ? result.data.owner : program.owner,
           });
@@ -68,35 +70,66 @@ const SalesPage = ({ program }) => {
     }
   };
 
-  const submitSales = (pages, index, errors) => {
-    setTimeout(async () => {
-      const result = await axios.put(
-        process.env.REACT_APP_API +
-          "/university/update-program/" +
-          values.progid,
-        { salesPage: pages[index], index: parseInt(index + 1) },
-        {
-          headers: {
-            authToken: token,
-          },
-        }
-      );
-      if (result.data.err) {
-        errors.push(result.data.err);
-        toast.error(result.data.err);
+  const copySalesTemp = async (saleid) => {
+    const result = await axios.put(
+      process.env.REACT_APP_API +
+        "/university/update-copysales/" +
+        saleid +
+        "/" +
+        values.progid,
+      {},
+      {
+        headers: {
+          authToken: token,
+        },
+      }
+    );
+    if (result.data.err) {
+      toast.error(result.data.err);
+    } else {
+      toast.success("Update saved!!!");
+    }
+  };
+
+  const submitSales = async (saleid, pages, index, errors) => {
+    const result = await axios.put(
+      process.env.REACT_APP_API + "/university/update-program/" + values.progid,
+      {
+        saleid,
+        salesPage: pages[index],
+        index: parseInt(index + 1),
+      },
+      {
+        headers: {
+          authToken: token,
+        },
+      }
+    );
+    if (result.data.err) {
+      errors.push(result.data.err);
+      toast.error(result.data.err);
+    } else if (result) {
+      if (result.data.saleid) {
+        saleid = result.data.saleid;
+        setValues({
+          ...values,
+          saleid,
+        });
       }
       if (pages.length > parseInt(index + 1)) {
-        submitSales(pages, ++index, errors);
+        submitSales(saleid, pages, ++index, errors);
       } else {
         quill.enable();
         setLoading(false);
         if (errors.length > 0) {
           toast.error(errors[0]);
         } else {
-          toast.success("Update saved!!!");
+          copySalesTemp(saleid);
         }
       }
-    }, 1000);
+    } else {
+      toast.success("Something failed!");
+    }
   };
 
   const handleSubmit = async () => {
@@ -105,7 +138,7 @@ const SalesPage = ({ program }) => {
       if (salesPages.length > 0) {
         quill.disable();
         setLoading(true);
-        submitSales(salesPages, 0, errors);
+        submitSales(values.saleid, salesPages, 0, errors);
       }
     } else {
       toast.error("Sorry! You are not the owner of that program.");
@@ -115,11 +148,44 @@ const SalesPage = ({ program }) => {
 
   return (
     <div align="center">
+      <div
+        style={{
+          width: isMobile ? "100%" : "80%",
+          marginBottom: 630,
+          marginTop: 10,
+        }}
+      >
+        <div
+          ref={quillRef}
+          style={{
+            width: isMobile ? "87%" : "78%",
+            position: "absolute",
+            height: 630,
+          }}
+        />
+      </div>
+      {loading && (
+        <>
+          <br />
+          <LoadingOutlined style={{ fontSize: 24 }} />
+          <br />
+        </>
+      )}
+      <Button
+        type="primary"
+        size="large"
+        style={{
+          margin: "10px 5px",
+        }}
+        onClick={() => handleSubmit()}
+      >
+        Submit Update
+      </Button>
       <Button
         type="default"
         size="large"
         style={{
-          margin: 10,
+          margin: "10px 5px",
         }}
         onClick={() =>
           window.open(
@@ -132,28 +198,6 @@ const SalesPage = ({ program }) => {
         }
       >
         View Sales Page
-      </Button>
-      <div style={{ width: isMobile ? "100%" : "80%" }}>
-        <div ref={quillRef} />
-      </div>
-      {loading && (
-        <>
-          <br />
-          <LoadingOutlined style={{ fontSize: 24 }} />
-          <br />
-        </>
-      )}
-      <Button
-        type="primary"
-        style={{
-          width: isMobile ? "100%" : 350,
-          height: isMobile ? 50 : 60,
-          fontSize: isMobile ? 18 : 24,
-          marginTop: 30,
-        }}
-        onClick={() => handleSubmit()}
-      >
-        Update Sales Page
       </Button>
     </div>
   );
