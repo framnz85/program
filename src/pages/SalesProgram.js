@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "antd";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -7,6 +7,7 @@ import ReactQuill from "react-quill";
 import { isMobile } from "react-device-detect";
 
 const SalesProgram = ({ setShowTab }) => {
+  const navigate = useNavigate();
   const { slug } = useParams();
   const queryParams = new URLSearchParams(window.location.search);
   let token = localStorage.getItem("token");
@@ -24,6 +25,7 @@ const SalesProgram = ({ setShowTab }) => {
   }
 
   const [salesPage, setSalesPage] = useState([]);
+  const [program, setProgram] = useState({});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -39,6 +41,7 @@ const SalesProgram = ({ setShowTab }) => {
     if (program.data.err) {
       toast.error(program.data.err);
     } else {
+      setProgram(program.data);
       const result = await axios.get(
         process.env.REACT_APP_API +
           "/university/program-sales/" +
@@ -75,9 +78,7 @@ const SalesProgram = ({ setShowTab }) => {
           marginBottom: 50,
           width: isMobile ? "90%" : "50%",
         }}
-        onClick={() =>
-          window.open("../program/" + slug + "?noRedirect=1", "_parent")
-        }
+        onClick={() => navigate("../program/" + program.slug + "?noRedirect=1")}
       >
         {loading ? (
           <>Loading Content...</>

@@ -85,15 +85,17 @@ const SalesPage = ({ program }) => {
       }
     );
     if (result.data.err) {
+      setLoading(false);
       toast.error(result.data.err);
     } else {
+      setLoading(false);
       toast.success("Update saved!!!");
     }
   };
 
   const submitSales = async (saleid, pages, index, errors) => {
     const result = await axios.put(
-      process.env.REACT_APP_API + "/university/update-program/" + values.progid,
+      process.env.REACT_APP_API + "/university/update-sales/" + values.progid,
       {
         saleid,
         salesPage: pages[index],
@@ -120,8 +122,8 @@ const SalesPage = ({ program }) => {
         submitSales(saleid, pages, ++index, errors);
       } else {
         quill.enable();
-        setLoading(false);
         if (errors.length > 0) {
+          setLoading(false);
           toast.error(errors[0]);
         } else {
           copySalesTemp(saleid);
