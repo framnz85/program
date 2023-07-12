@@ -59,11 +59,12 @@ const ProgDetails = () => {
         ...(result.data.packages &&
           result.data.packages.map((pack) => pack.discountPrice))
       );
-      const maxPackage =
-        result.data.packages &&
-        result.data.packages.find(
-          (pack) => pack.discountPrice === String(maxPackagePrice)
-        );
+      const maxPackage = maxPackagePrice
+        ? result.data.packages &&
+          result.data.packages.find(
+            (pack) => pack.discountPrice === String(maxPackagePrice)
+          )
+        : maxPackagePrice;
       setDefaultPackage(maxPackage);
     }
   };
