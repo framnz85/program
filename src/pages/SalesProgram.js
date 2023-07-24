@@ -14,6 +14,7 @@ const SalesProgram = ({ setShowTab }) => {
   if (!token) {
     token = sessionStorage.getItem("token");
   }
+  const salesPageArray = [];
 
   const refid = queryParams.get("refid");
 
@@ -42,17 +43,26 @@ const SalesProgram = ({ setShowTab }) => {
       toast.error(program.data.err);
     } else {
       setProgram(program.data);
-      const result = await axios.get(
-        process.env.REACT_APP_API +
-          "/university/program-sales/" +
-          program.data._id
-      );
-      if (result.data.err) {
-        toast.error(result.data.err);
+      fetchProgramSales(program.data._id, 0);
+    }
+  };
+
+  const fetchProgramSales = async (progid, index) => {
+    const result = await axios.get(
+      process.env.REACT_APP_API +
+        "/university/program-sales-perindex/" +
+        progid +
+        "/" +
+        index
+    );
+    if (result.data.err) {
+      toast.error(result.data.err);
+    } else {
+      salesPageArray[index] = result.data.salesPage;
+      if (result.data.more) {
+        setSalesPage(salesPageArray.join(""));
+        fetchProgramSales(progid, parseInt(index) + 1);
       } else {
-        setSalesPage(
-          result.data.salesPage ? result.data.salesPage.join("") : []
-        );
         setLoading(false);
       }
     }

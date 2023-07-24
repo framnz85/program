@@ -4,7 +4,7 @@ import { Layout } from "antd";
 import { isMobile } from "react-device-detect";
 import axios from "axios";
 import { toast } from "react-toastify";
-import ReactPlayer from "react-player/vimeo";
+import ReactPlayer from "react-player/lazy";
 
 import MainHeader from "../common/MainHeader";
 import MainFooter from "../common/MainFooter";
@@ -52,6 +52,9 @@ const AccessProgram = () => {
         setValues({
           title: result.data.lessons[0].videos[0].title,
           vimeoId: result.data.lessons[0].videos[0].vimeoId,
+          type: result.data.lessons[0].videos[0].type
+            ? result.data.lessons[0].videos[0].type
+            : "",
         });
       }
     }
@@ -131,7 +134,11 @@ const AccessProgram = () => {
                 >
                   {values.vimeoId && (
                     <ReactPlayer
-                      url={`https://vimeo.com/${values.vimeoId}`}
+                      url={
+                        values.type && values.type === "youtube"
+                          ? `https://www.youtube.com/watch?v=${values.vimeoId}`
+                          : `https://vimeo.com/${values.vimeoId}`
+                      }
                       width={isMobile ? "100%" : "100%"}
                       height={isMobile ? "250px" : "650px"}
                       controls={true}

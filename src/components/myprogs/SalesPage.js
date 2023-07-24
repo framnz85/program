@@ -31,6 +31,7 @@ const SalesPage = ({ program }) => {
   }, [quill]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchProgramQuill = async (quill) => {
+    setLoading(true);
     const result = await axios.get(
       process.env.REACT_APP_API + "/university/program-sales/" + program._id
     );
@@ -60,6 +61,7 @@ const SalesPage = ({ program }) => {
           navigate("/myprograms");
         }
       }
+      setLoading(false);
     } else {
       quill.clipboard.dangerouslyPasteHTML("");
       quill.on("text-change", () => {
@@ -67,6 +69,7 @@ const SalesPage = ({ program }) => {
           quillRef.current.firstChild.innerHTML.match(/.{1,500000}/g)
         );
       });
+      setLoading(false);
     }
   };
 
@@ -94,6 +97,7 @@ const SalesPage = ({ program }) => {
   };
 
   const submitSales = async (saleid, pages, index, errors) => {
+    setLoading(true);
     const result = await axios.put(
       process.env.REACT_APP_API + "/university/update-sales/" + values.progid,
       {
@@ -110,6 +114,7 @@ const SalesPage = ({ program }) => {
     if (result.data.err) {
       errors.push(result.data.err);
       toast.error(result.data.err);
+      setLoading(false);
     } else if (result) {
       if (result.data.saleid) {
         saleid = result.data.saleid;
@@ -123,14 +128,15 @@ const SalesPage = ({ program }) => {
       } else {
         quill.enable();
         if (errors.length > 0) {
-          setLoading(false);
           toast.error(errors[0]);
         } else {
           copySalesTemp(saleid);
         }
+        setLoading(false);
       }
     } else {
       toast.success("Something failed!");
+      setLoading(false);
     }
   };
 
@@ -180,6 +186,7 @@ const SalesPage = ({ program }) => {
           margin: "10px 5px",
         }}
         onClick={() => handleSubmit()}
+        disabled={loading}
       >
         Submit Update
       </Button>
