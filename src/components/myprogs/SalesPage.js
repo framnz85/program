@@ -16,11 +16,7 @@ const SalesPage = ({ program }) => {
     token = sessionStorage.getItem("token");
   }
 
-  const [values, setValues] = useState({
-    saleid: "",
-    progid: program._id,
-    owner: program.owner,
-  });
+  const [values, setValues] = useState({});
   const [salesPages, setSalesPages] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -31,26 +27,36 @@ const SalesPage = ({ program }) => {
   }, [quill]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchProgramQuill = async (quill) => {
+    const salesPageArray = [];
     setLoading(true);
-    const result = await axios.get(
+    const salesPage = await axios.get(
       process.env.REACT_APP_API + "/university/program-sales/" + program._id
     );
-    if (result.data) {
-      if (result.data.err) {
-        toast.error(result.data.err);
+    if (salesPage.data) {
+      if (salesPage.data.err) {
+        toast.error(salesPage.data.err);
       } else {
         if (sessionUser._id === program.owner) {
           setValues({
             ...values,
-            saleid: result.data._id ? result.data._id : "",
-            progid: result.data.progid ? result.data.progid : "",
-            owner: result.data.owner ? result.data.owner : program.owner,
+            ...salesPage.data,
           });
-          setSalesPages(result.data.salesPage ? result.data.salesPage : []);
-          const combineSalesPage = result.data.salesPage
-            ? result.data.salesPage.join("")
-            : "";
-          quill.clipboard.dangerouslyPasteHTML(combineSalesPage);
+          for (let i = 0; i <= salesPage.data.salesPagesCount; i++) {
+            const result = await axios.get(
+              process.env.REACT_APP_CLAVMALL_IMG +
+                "/program_function/getfile.php?progid=" +
+                program._id +
+                "&saleid=" +
+                salesPage.data._id +
+                "&index=" +
+                i
+            );
+            if (result.data.text) {
+              salesPageArray[i] = result.data.text;
+              setSalesPages(salesPageArray);
+              quill.clipboard.dangerouslyPasteHTML(salesPageArray.join(""));
+            }
+          }
           quill.on("text-change", () => {
             setSalesPages(
               quillRef.current.firstChild.innerHTML.match(/.{1,500000}/g)
@@ -73,37 +79,61 @@ const SalesPage = ({ program }) => {
     }
   };
 
-  const copySalesTemp = async (saleid) => {
-    const result = await axios.put(
-      process.env.REACT_APP_API +
-        "/university/update-copysales/" +
-        saleid +
-        "/" +
-        values.progid,
-      {},
-      {
-        headers: {
-          authToken: token,
-        },
-      }
+  const copySalesTemp = async (updateSales) => {
+    const copySales = await axios.post(
+      process.env.REACT_APP_CLAVMALL_IMG +
+        "/program_function/setfile.php?progid=" +
+        program._id +
+        "&saleid=" +
+        updateSales._id
     );
-    if (result.data.err) {
+    console.log(copySales.data);
+    if (copySales.data.err) {
+      quill.enable();
       setLoading(false);
-      toast.error(result.data.err);
+      toast.error(copySales.data.err);
     } else {
+      quill.enable();
       setLoading(false);
       toast.success("Update saved!!!");
     }
   };
 
-  const submitSales = async (saleid, pages, index, errors) => {
-    setLoading(true);
-    const result = await axios.put(
+  const createSalesTemp = async (updateSales, pages) => {
+    const emptyTemp = await axios.post(
+      process.env.REACT_APP_CLAVMALL_IMG +
+        "/program_function/deltemp.php?progid=" +
+        program._id +
+        "&saleid=" +
+        updateSales._id
+    );
+    if (emptyTemp.data.err) {
+      toast.error(emptyTemp.data.err);
+      quill.enable();
+      setLoading(false);
+    } else {
+      for (let i = 0; i <= updateSales.salesPagesCount; i++) {
+        await axios.post(
+          process.env.REACT_APP_CLAVMALL_IMG +
+            "/program_function/settemp.php?progid=" +
+            program._id +
+            "&saleid=" +
+            updateSales._id +
+            "&index=" +
+            i,
+          { page: pages[i] }
+        );
+      }
+      copySalesTemp(updateSales);
+    }
+  };
+
+  const submitSales = async (saleid, pages) => {
+    const updateSales = await axios.put(
       process.env.REACT_APP_API + "/university/update-sales/" + values.progid,
       {
         saleid,
-        salesPage: pages[index],
-        index: parseInt(index + 1),
+        salesPagesCount: pages.length - 1,
       },
       {
         headers: {
@@ -111,42 +141,21 @@ const SalesPage = ({ program }) => {
         },
       }
     );
-    if (result.data.err) {
-      errors.push(result.data.err);
-      toast.error(result.data.err);
+    if (updateSales.data.err) {
+      toast.error(updateSales.data.err);
+      quill.enable();
       setLoading(false);
-    } else if (result) {
-      if (result.data.saleid) {
-        saleid = result.data.saleid;
-        setValues({
-          ...values,
-          saleid,
-        });
-      }
-      if (pages.length > parseInt(index + 1)) {
-        submitSales(saleid, pages, ++index, errors);
-      } else {
-        quill.enable();
-        if (errors.length > 0) {
-          toast.error(errors[0]);
-        } else {
-          copySalesTemp(saleid);
-        }
-        setLoading(false);
-      }
     } else {
-      toast.success("Something failed!");
-      setLoading(false);
+      createSalesTemp(updateSales.data, pages);
     }
   };
 
   const handleSubmit = async () => {
     if (sessionUser._id === values.owner) {
-      let errors = [];
       if (salesPages.length > 0) {
         quill.disable();
         setLoading(true);
-        submitSales(values.saleid, salesPages, 0, errors);
+        submitSales(values.saleid, salesPages);
       }
     } else {
       toast.error("Sorry! You are not the owner of that program.");

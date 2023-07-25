@@ -43,33 +43,37 @@ const SalesProgram = ({ setShowTab }) => {
       toast.error(program.data.err);
     } else {
       setProgram(program.data);
-      fetchProgramSales(program.data._id, 0);
+      fetchProgramSales(program.data._id);
     }
   };
 
-  const fetchProgramSales = async (progid, index) => {
-    const result = await axios.get(
-      process.env.REACT_APP_API +
-        "/university/program-sales-perindex/" +
-        progid +
-        "/" +
-        index
+  const fetchProgramSales = async (progid) => {
+    const salesPageArray = [];
+    const salesPage = await axios.get(
+      process.env.REACT_APP_API + "/university/program-sales/" + progid
     );
-    if (result.data.err) {
-      toast.error(result.data.err);
+    if (salesPage.data.err) {
+      toast.error(salesPage.data.err);
     } else {
-      salesPageArray[index] = result.data.salesPage;
-      if (result.data.more) {
+      for (let i = 0; i <= salesPage.data.salesPagesCount; i++) {
+        const result = await axios.get(
+          process.env.REACT_APP_CLAVMALL_IMG +
+            "/program_function/getfile.php?progid=" +
+            progid +
+            "&saleid=" +
+            salesPage.data._id +
+            "&index=" +
+            i
+        );
+        salesPageArray[i] = result.data.text;
         setSalesPage(salesPageArray.join(""));
-        fetchProgramSales(progid, parseInt(index) + 1);
-      } else {
-        setLoading(false);
       }
+      setLoading(false);
     }
   };
 
   return (
-    <div align="center">
+    <div align="center" style={{ height: 1200 }}>
       <div style={{ width: isMobile ? "100%" : "80%", padding: 20 }}>
         <ReactQuill
           value={salesPage ? salesPage : ""}
