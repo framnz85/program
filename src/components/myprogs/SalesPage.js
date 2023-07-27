@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Button } from "antd";
+import { Button, Select } from "antd";
 import { useQuill } from "react-quilljs";
 import { isMobile } from "react-device-detect";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import { LoadingOutlined } from "@ant-design/icons";
+import {
+  LoadingOutlined,
+  FormOutlined,
+  DeleteOutlined,
+} from "@ant-design/icons";
+
+import AddSalesTitle from "../modal/AddSalesTitle";
 
 const SalesPage = ({ program }) => {
   const navigate = useNavigate();
@@ -17,55 +23,74 @@ const SalesPage = ({ program }) => {
   }
 
   const [values, setValues] = useState({});
+  const [selectPages, setSelectPages] = useState([]);
   const [salesPages, setSalesPages] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [addEditTitle, setAddEditTitle] = useState(0);
+
   useEffect(() => {
     if (quill) {
-      fetchProgramQuill(quill);
+      fetchProgramQuill();
     }
   }, [quill]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const fetchProgramQuill = async (quill) => {
-    const salesPageArray = [];
+  const fetchProgramQuill = async () => {
     setLoading(true);
-    const salesPage = await axios.get(
+    const progSalePages = await axios.get(
       process.env.REACT_APP_API + "/university/program-sales/" + program._id
     );
-    if (salesPage.data) {
-      if (salesPage.data.err) {
-        toast.error(salesPage.data.err);
+    if (progSalePages.data.err) {
+      toast.error(progSalePages.data.err);
+    } else {
+      if (progSalePages.data.length > 0) {
+        setSelectPages(
+          progSalePages.data.map((sale) => {
+            return { ...sale, value: sale._id, label: sale.title };
+          })
+        );
+        setLoading(false);
+        loadProgramQuill(progSalePages.data[0]);
       } else {
-        if (sessionUser._id === program.owner) {
-          setValues({
-            ...values,
-            ...salesPage.data,
-          });
-          for (let i = 0; i <= salesPage.data.salesPagesCount; i++) {
-            const result = await axios.get(
-              process.env.REACT_APP_CLAVMALL_IMG +
-                "/program_function/getfile.php?progid=" +
-                program._id +
-                "&saleid=" +
-                salesPage.data._id +
-                "&index=" +
-                i
-            );
-            if (result.data.text) {
-              salesPageArray[i] = result.data.text;
-              setSalesPages(salesPageArray);
-              quill.clipboard.dangerouslyPasteHTML(salesPageArray.join(""));
-            }
+        setLoading(false);
+      }
+    }
+  };
+
+  const loadProgramQuill = async (progSalePage) => {
+    const salesPageArray = [];
+    setSalesPages([]);
+    quill.clipboard.dangerouslyPasteHTML("");
+    if (progSalePage) {
+      if (sessionUser._id === program.owner) {
+        setValues({
+          ...values,
+          ...progSalePage,
+        });
+        for (let i = 0; i <= progSalePage.salesPagesCount; i++) {
+          const result = await axios.get(
+            process.env.REACT_APP_CLAVMALL_IMG +
+              "/program_function/getfile.php?progid=" +
+              program._id +
+              "&saleid=" +
+              progSalePage._id +
+              "&index=" +
+              i
+          );
+          if (result.data.text) {
+            salesPageArray[i] = result.data.text;
+            setSalesPages(salesPageArray);
+            quill.clipboard.dangerouslyPasteHTML(salesPageArray.join(""));
           }
-          quill.on("text-change", () => {
-            setSalesPages(
-              quillRef.current.firstChild.innerHTML.match(/.{1,500000}/g)
-            );
-          });
-        } else {
-          toast.error("Sorry! You are not the owner of that program.");
-          navigate("/myprograms");
         }
+        quill.on("text-change", () => {
+          setSalesPages(
+            quillRef.current.firstChild.innerHTML.match(/.{1,500000}/g)
+          );
+        });
+      } else {
+        toast.error("Sorry! You are not the owner of that program.");
+        navigate("/myprograms");
       }
       setLoading(false);
     } else {
@@ -87,7 +112,6 @@ const SalesPage = ({ program }) => {
         "&saleid=" +
         updateSales._id
     );
-    console.log(copySales.data);
     if (copySales.data.err) {
       quill.enable();
       setLoading(false);
@@ -96,6 +120,16 @@ const SalesPage = ({ program }) => {
       quill.enable();
       setLoading(false);
       toast.success("Update saved!!!");
+
+      await axios.put(
+        process.env.REACT_APP_API + "/university/update-program/" + program._id,
+        { salesPage: "update" },
+        {
+          headers: {
+            authToken: token,
+          },
+        }
+      );
     }
   };
 
@@ -128,11 +162,12 @@ const SalesPage = ({ program }) => {
     }
   };
 
-  const submitSales = async (saleid, pages) => {
+  const submitSales = async (saleid, title, pages) => {
     const updateSales = await axios.put(
-      process.env.REACT_APP_API + "/university/update-sales/" + values.progid,
+      process.env.REACT_APP_API + "/university/update-sales/" + program._id,
       {
         saleid,
+        title,
         salesPagesCount: pages.length - 1,
       },
       {
@@ -151,11 +186,13 @@ const SalesPage = ({ program }) => {
   };
 
   const handleSubmit = async () => {
-    if (sessionUser._id === values.owner) {
-      if (salesPages.length > 0) {
+    if (sessionUser._id === program.owner) {
+      if (values._id && values.title && salesPages.length > 0) {
         quill.disable();
         setLoading(true);
-        submitSales(values.saleid, salesPages);
+        submitSales(values._id, values.title, salesPages);
+      } else {
+        setAddEditTitle(1);
       }
     } else {
       toast.error("Sorry! You are not the owner of that program.");
@@ -163,12 +200,44 @@ const SalesPage = ({ program }) => {
     }
   };
 
+  const handleChange = (value) => {
+    if (value === "add") {
+      setAddEditTitle(1);
+    } else {
+      const selectedPage = selectPages.find((page) => page._id === value);
+      loadProgramQuill(selectedPage);
+    }
+  };
+
   return (
     <div align="center">
+      <span>Select Sales Page: </span>{" "}
+      <Select
+        defaultValue={selectPages[0]}
+        style={{
+          width: 320,
+          marginTop: 10,
+        }}
+        onChange={handleChange}
+        options={[...selectPages, { value: "add", label: "+ Add Sales Page" }]}
+      />{" "}
+      <FormOutlined
+        style={{ fontSize: 18, margin: "0 5px", cursor: "pointer" }}
+        onClick={() => setAddEditTitle(2)}
+      />
+      <DeleteOutlined
+        style={{
+          fontSize: 18,
+          margin: "0 5px",
+          cursor: "pointer",
+          color: "red",
+        }}
+        onClick={() => setAddEditTitle(3)}
+      />
       <div
         style={{
           width: isMobile ? "100%" : "80%",
-          marginBottom: 630,
+          marginBottom: 600,
           marginTop: 10,
         }}
       >
@@ -177,7 +246,7 @@ const SalesPage = ({ program }) => {
           style={{
             width: isMobile ? "87%" : "78%",
             position: "absolute",
-            height: 630,
+            height: 600,
           }}
         />
       </div>
@@ -207,9 +276,9 @@ const SalesPage = ({ program }) => {
         }}
         onClick={() =>
           window.open(
-            `/${program.saleSlug ? "p/" + program.saleSlug : ""}?refid=${
-              sessionUser._id
-            }`,
+            `/${program.saleSlug ? "p/" + program.saleSlug : ""}/?saleid=${
+              values._id
+            }&refid=${sessionUser._id}`,
             "_blank",
             "noreferrer"
           )
@@ -217,6 +286,14 @@ const SalesPage = ({ program }) => {
       >
         View Sales Page
       </Button>
+      <AddSalesTitle
+        values={values}
+        setValues={setValues}
+        addEditTitle={addEditTitle}
+        setAddEditTitle={setAddEditTitle}
+        program={program}
+        fetchProgramQuill={fetchProgramQuill}
+      />
     </div>
   );
 };

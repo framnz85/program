@@ -14,8 +14,9 @@ const SalesProgram = ({ setShowTab }) => {
   if (!token) {
     token = sessionStorage.getItem("token");
   }
-  const salesPageArray = [];
-
+  const localProgram = JSON.parse(localStorage.getItem("program"));
+  const salesPage1 = JSON.parse(localStorage.getItem("salesPage1"));
+  const saleid = queryParams.get("saleid");
   const refid = queryParams.get("refid");
 
   if (
@@ -30,7 +31,13 @@ const SalesProgram = ({ setShowTab }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchProgram();
+    if (localProgram) {
+      setProgram(localProgram);
+      fetchProgramSales(localProgram._id);
+      fetchProgram();
+    } else {
+      fetchProgram();
+    }
     setShowTab(false);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -42,29 +49,57 @@ const SalesProgram = ({ setShowTab }) => {
     if (program.data.err) {
       toast.error(program.data.err);
     } else {
-      setProgram(program.data);
-      fetchProgramSales(program.data._id);
+      if (
+        !localProgram ||
+        (localProgram &&
+          localProgram.productChange !== program.data.productChange)
+      ) {
+        setProgram(program.data);
+        localStorage.setItem("program", JSON.stringify(program.data));
+        fetchProgramSales(program.data._id);
+      }
     }
   };
 
   const fetchProgramSales = async (progid) => {
-    const salesPageArray = [];
+    const salesPageArray =
+      salesPage1 && salesPage1.saleid ? [salesPage1.quill] : [];
     const salesPage = await axios.get(
       process.env.REACT_APP_API + "/university/program-sales/" + progid
     );
     if (salesPage.data.err) {
       toast.error(salesPage.data.err);
     } else {
-      for (let i = 0; i <= salesPage.data.salesPagesCount; i++) {
+      let progSale = {};
+      if (saleid) {
+        progSale = salesPage.data.find((page) => page._id === saleid);
+      }
+      for (
+        let i =
+          salesPage1 && salesPage1.saleid && salesPage1.saleid === progSale._id
+            ? 1
+            : 0;
+        i <= progSale.salesPagesCount;
+        i++
+      ) {
         const result = await axios.get(
           process.env.REACT_APP_CLAVMALL_IMG +
             "/program_function/getfile.php?progid=" +
             progid +
             "&saleid=" +
-            salesPage.data._id +
+            progSale._id +
             "&index=" +
             i
         );
+        if (i === 0) {
+          localStorage.setItem(
+            "salesPage1",
+            JSON.stringify({
+              saleid: progSale._id,
+              quill: result.data.text,
+            })
+          );
+        }
         salesPageArray[i] = result.data.text;
         setSalesPage(salesPageArray.join(""));
       }
