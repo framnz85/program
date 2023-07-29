@@ -42,6 +42,9 @@ const Register = ({regFromProg = false, pathname = ""}) => {
     
             if (user && user.data.err) {
                 toast.error(user.data.err);
+                if(user.data.exist){
+                    navigate("/login");
+                }
             } else {
                 sessionStorage.setItem("programUser", JSON.stringify(user.data));
                 localStorage.setItem("token", token.data);

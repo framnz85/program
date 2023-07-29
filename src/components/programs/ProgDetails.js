@@ -220,6 +220,7 @@ const ProgDetails = () => {
                 setUser={setUser}
                 pathname={"/program/" + slug + "?noRedirect=1"}
                 noRedirect={noRedirect}
+                defaultPackage={defaultPackage}
                 setDefaultPackage={setDefaultPackage}
               />
             )}

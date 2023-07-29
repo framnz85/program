@@ -272,11 +272,11 @@ const PayInstruction = ({
             <br />
             Credit / Debit Card
           </Radio.Button>
-          <Radio.Button value="bdo" style={{ height: 80 }}>
+          {/* <Radio.Button value="bdo" style={{ height: 80 }}>
             <img src={BDO} width="100" height="50" alt="BDO Payment" />
             <br />
             BDO Deposit or Online
-          </Radio.Button>
+          </Radio.Button> */}
           <Radio.Button value="bpi" style={{ height: 80 }}>
             <img src={BPI} width="100" height="50" alt="BPI Payment" />
             <br />
@@ -473,9 +473,9 @@ const PayInstruction = ({
               Send. Then provide the details below: <br />
               <br />
               <div align="center">
-                <b>Account/Mobile Number:</b> 09778557778
+                <b>Account/Mobile Number:</b> 09177140010
                 <br />
-                <b>Account Name:</b> Francis John Clavano
+                <b>Account Name:</b> Rowena Clavano
                 <br />
                 <b>Amount:</b> ₱
                 {amount &&
@@ -507,9 +507,9 @@ const PayInstruction = ({
               money. Then provide the details below: <br />
               <br />
               <div align="center">
-                <b>Account/Mobile Number:</b> 09778557778
+                <b>Account/Mobile Number:</b> 09177140010
                 <br />
-                <b>Account Name:</b> Francis John Clavano
+                <b>Account Name:</b> Rowena Clavano
                 <br />
                 <b>Amount:</b> ₱
                 {amount &&
