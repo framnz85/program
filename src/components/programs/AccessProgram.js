@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Layout } from "antd";
+import { Layout, Button } from "antd";
 import { isMobile } from "react-device-detect";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -55,6 +55,9 @@ const AccessProgram = () => {
           type: result.data.lessons[0].videos[0].type
             ? result.data.lessons[0].videos[0].type
             : "",
+          buttonTitle: result.data.lessons[0].videos[0].buttonTitle,
+          description: result.data.lessons[0].videos[0].description,
+          buttonLink: result.data.lessons[0].videos[0].buttonLink,
         });
       }
     }
@@ -83,6 +86,7 @@ const AccessProgram = () => {
         dashboard={dashboard}
         setDashboard={setDashboard}
         pathname={"/access/" + slug}
+        noRedirect={queryParams.get("nomodal")}
       />
       <div
         align="center"
@@ -146,6 +150,23 @@ const AccessProgram = () => {
                   )}
                 </div>
                 <h3>{values.title}</h3>
+                {values.description && (
+                  <h5>
+                    <br />
+                    {values.description}
+                  </h5>
+                )}
+                {values.buttonTitle && values.buttonLink && (
+                  <Button
+                    type="primary"
+                    size="large"
+                    onClick={() => window.open(values.buttonLink)}
+                  >
+                    {values.buttonTitle}
+                  </Button>
+                )}
+                <br />
+                <br />
               </div>
             </div>
           </div>

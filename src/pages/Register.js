@@ -43,7 +43,7 @@ const Register = ({regFromProg = false, pathname = ""}) => {
             if (user && user.data.err) {
                 toast.error(user.data.err);
                 if(user.data.exist){
-                    navigate("/login");
+                    navigate("/login", {state: { from: pathToRedirect && pathToRedirect.length > 0 ? pathToRedirect : "/home" }});
                 }
             } else {
                 sessionStorage.setItem("programUser", JSON.stringify(user.data));

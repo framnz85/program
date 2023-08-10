@@ -125,11 +125,17 @@ const MainFooter = ({ setTabMenu = () => "", noRedirect = false }) => {
           textAlign: "center",
         }}
       >
-        NOTE: You will earn P1 each person who successfully registered using
-        your Clavstore University Affiliate Links.{" "}
-        <Link to="/program/clavstore-affiliate-training">
-          Go To Affiliate Links
-        </Link>
+        {noRedirect ? (
+          <>Choose A Package</>
+        ) : (
+          <>
+            NOTE: You will earn P1 each person who successfully registered using
+            your Clavstore University Affiliate Links.{" "}
+            <Link to="/program/clavstore-affiliate-training">
+              Go To Affiliate Links
+            </Link>
+          </>
+        )}
       </Footer>
       <Modal title="" open={isModalOpen} onCancel={handleCancel} footer={null}>
         {rewardType === 1 && (

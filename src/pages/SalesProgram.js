@@ -64,6 +64,7 @@ const SalesProgram = ({ setShowTab }) => {
   const fetchProgramSales = async (progid) => {
     const salesPageArray =
       salesPage1 && salesPage1.saleid ? [salesPage1.quill] : [];
+    setSalesPage(salesPageArray.join(""));
     const salesPage = await axios.get(
       process.env.REACT_APP_API + "/university/program-sales/" + progid
     );

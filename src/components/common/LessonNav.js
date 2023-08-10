@@ -40,8 +40,15 @@ const LessonNav = ({ program, setValues }) => {
     const getTheVideo = getLesson[0].videos.filter(
       (vid) => vid._id === value.keyPath[0]
     );
-    const { title, vimeoId, type = "" } = getTheVideo[0];
-    setValues({ title, vimeoId, type });
+    const {
+      title,
+      vimeoId,
+      type = "",
+      buttonTitle = "",
+      description = "",
+      buttonLink = "",
+    } = getTheVideo[0];
+    setValues({ title, vimeoId, type, buttonTitle, description, buttonLink });
     navigate(
       `/access/${program.slug}/?video=${value.keyPath[0]}${
         queryParams.get("nomodal") || sessionStorage.getItem("nomodal")
@@ -62,6 +69,9 @@ const LessonNav = ({ program, setValues }) => {
                   title: vid.title,
                   vimeoId: vid.vimeoId,
                   type: vid.type ? vid.type : "",
+                  buttonTitle: vid.buttonTitle ? vid.buttonTitle : "",
+                  description: vid.description ? vid.description : "",
+                  buttonLink: vid.buttonLink ? vid.buttonLink : "",
                 })
               : "";
           })

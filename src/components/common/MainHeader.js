@@ -115,7 +115,9 @@ const MainHeader = ({
     }
   };
 
-  const headerNav = isMobile
+  const headerNav = noRedirect
+    ? [{ key: 8, label: "Clavstore University" }]
+    : isMobile
     ? [
         { key: 7, label: "Withdraw" },
         { key: 5, label: "Premium", destination: "/premium" },
@@ -174,7 +176,7 @@ const MainHeader = ({
               color: "#ffffff",
             }}
           >
-            Hi! {sessionUser && sessionUser.name}
+            {sessionUser && sessionUser.name ? `Hi! ${sessionUser.name}` : ""}
           </h5>
         )}
       </Header>
